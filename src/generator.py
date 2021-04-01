@@ -55,6 +55,7 @@ class DuckBuilder:
             }
         }
 
+    @classmethod
     def generate(cls, options: Union[DuckRequest, None] = None):
         options = options.dict() if options else cls.make_random()
 
