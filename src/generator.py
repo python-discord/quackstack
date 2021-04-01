@@ -55,7 +55,7 @@ class DuckBuilder:
             }
         }
 
-    def generate(cls, options: Union[DuckRequest, None]):
+    def generate(cls, options: Union[DuckRequest, None] = None):
         options = options.dict() if options else cls.make_random()
 
         output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
