@@ -10,6 +10,7 @@ python = "^3.8"
 fastapi = "^0.63.0"
 Pillow = "^8.1.2"
 Hypercorn = "^0.11.2"
+aiofiles = "^0.6.0"
 
 [tool.poetry.dev-dependencies]
 
