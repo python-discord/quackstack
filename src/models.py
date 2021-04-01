@@ -19,4 +19,5 @@ class DuckRequest(BaseModel):
     wing: PartOption
     eye: PartOption
     beak: PartOption
+    eye_wing: PartOption
     accessories: Accessories
