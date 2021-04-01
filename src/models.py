@@ -3,10 +3,9 @@ from typing import Optional
 
 
 class PartOption(BaseModel):
-    colour: int
-    lightness: float
-    dark: bool
-    hue: float
+    r: int
+    g: int
+    b: int
 
 
 class Accessories(BaseModel):
