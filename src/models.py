@@ -5,7 +5,8 @@ from typing import Optional
 class PartOption(BaseModel):
     colour: Optional[int]
     lightness: Optional[float]
-    darK: Optional[bool]
+    dark: Optional[bool]
+    hue: Optional[float]
 
 
 class Accessories(BaseModel):
