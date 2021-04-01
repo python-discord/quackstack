@@ -47,6 +47,7 @@ class DuckBuilder:
             "wing": randrgb(),
             "eye": randrgb(),
             "beak": randrgb(),
+            "eye_wing": randrgb(),
             "accessories": {
                 "hat": choice([*list(cls.hats), None]),
                 "outfit": choice([*list(cls.outfits), None]),
