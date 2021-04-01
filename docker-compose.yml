@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  api:
+    build: .
+    restart: always
+    ports:
+      - 8077:80
+    environment:
+      LOCATION: "/ducks"
+    volumes:
+      - ./ducks:/ducks

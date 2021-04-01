@@ -18,7 +18,7 @@ CACHE.mkdir(exist_ok=True)
 
 app = FastAPI(docs_url=None)
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=CACHE), name="static")
 
 def dicthash(data: dict):
     return sha1(dumps(data).encode()).hexdigest()
