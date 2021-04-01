@@ -9,9 +9,9 @@ class PartOption(BaseModel):
 
 
 class Accessories(BaseModel):
-    hat: str
-    outfit: str
-    equipment: str
+    hat: Optional[str]
+    outfit: Optional[str]
+    equipment: Optional[str]
 
 
 class DuckRequest(BaseModel):
