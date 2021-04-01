@@ -6,15 +6,19 @@ from json import dumps
 from time import time
 from os import getenv
 
-from starlette.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.models import DuckRequest
 from src.generator import DuckBuilder
 
 
-CACHE = Path(getenv("LOCATION", "./ducks"))
+CACHE = Path(getenv("LOCATION", "./static"))
+
+CACHE.mkdir(exist_ok=True)
 
 app = FastAPI(docs_url=None)
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 def dicthash(data: dict):
     return sha1(dumps(data).encode()).hexdigest()
