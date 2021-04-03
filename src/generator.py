@@ -1,8 +1,9 @@
-from fastapi import HTTPException
 from pathlib import Path
-from typing import Union, Tuple, Optional
 from random import choice, randint
+from typing import Dict, Optional, Tuple
+
 from PIL import Image, ImageChops
+from fastapi import HTTPException
 
 from .models import DuckRequest
 
@@ -29,25 +30,31 @@ class DuckBuilder:
 
     @staticmethod
     def validate_rgb(name: str, data: dict) -> bool:
+        """Validate that the provided data dictionary has compliant RGB values (0-255)."""
         if not all(0 <= value <= 255 for value in data.values()):
             raise HTTPException(400, f"Invalid RGB values given for {name}")
         return (data["r"], data["g"], data["b"])
 
-    @classmethod
-    def make_random(cls):
-        def randrgb():
-            return {
-                "r": randint(0, 255),
-                "g": randint(0, 255),
-                "b": randint(0, 255),
-            }
+    @staticmethod
+    def random_rgb() -> Dict[str, int]:
+        """Generate a random RGB colour."""
+        # TODO: refactor this to use colorsys for nicer colours.
 
         return {
-            "body": randrgb(),
-            "wing": randrgb(),
-            "eye": randrgb(),
-            "beak": randrgb(),
-            "eye_wing": randrgb(),
+            "r": randint(0, 255),
+            "g": randint(0, 255),
+            "b": randint(0, 255),
+        }
+
+    @classmethod
+    def make_random(cls):
+        """Generate a random RGB duck structure."""
+        return {
+            "body": cls.random_rgb(),
+            "wing": cls.random_rgb(),
+            "eye": cls.random_rgb(),
+            "beak": cls.random_rgb(),
+            "eye_wing": cls.random_rgb(),
             "accessories": {
                 "hat": choice([*list(cls.hats), None]),
                 "outfit": choice([*list(cls.outfits), None]),
@@ -56,7 +63,8 @@ class DuckBuilder:
         }
 
     @classmethod
-    def generate(cls, options: Union[DuckRequest, None] = None):
+    def generate(cls, options: Optional[DuckRequest] = None):
+        """Generate a duck from the provided request, else generate a random one."""
         options = options.dict() if options else cls.make_random()
 
         output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
@@ -72,16 +80,17 @@ class DuckBuilder:
         outfit = accessories["outfit"]
         hat = accessories["hat"]
 
-        if equipment and not equipment in cls.equipments:
+        if equipment and equipment not in cls.equipments:
             raise HTTPException(400, "Invalid equipment provided.")
 
-        if outfit and not outfit in cls.outfits:
+        if outfit and outfit not in cls.outfits:
             raise HTTPException(400, "Invalid outfit provided.")
 
-        if hat and not hat in cls.hats:
+        if hat and hat not in cls.hats:
             raise HTTPException(400, "Invalid hat provided.")
 
-        def apply_layer(layer: Image.Image, recolor: Optional[Tuple[int, int, int]] = None):
+        # TODO: move this function outside of this method body.
+        def apply_layer(layer: Image.Image, recolor: Optional[Tuple[int, int, int]] = None) -> None:
             if recolor:
                 layer = ImageChops.multiply(layer, Image.new("RGBA", DUCK_SIZE, color=recolor))
             output.alpha_composite(layer)
