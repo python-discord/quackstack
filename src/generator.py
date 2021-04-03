@@ -91,18 +91,15 @@ class DuckBuilder:
         apply_layer(cls.templates[1], eye)
 
         if outfit:
-            outfit_type = cls.outfits[outfit]
-            apply_layer(outfit_type)
+            apply_layer(cls.outfits[outfit])
 
         if equipment:
-            equipment_type = cls.equipments[equipment]
-            apply_layer(equipment_type)
+            apply_layer(cls.equipments[equipment])
 
         apply_layer(cls.templates[3], wing)
         apply_layer(cls.templates[2], eye_wing)
 
         if hat:
-            hat_type = cls.hats[hat]
-            apply_layer(hat_type)
+            apply_layer(cls.hats[hat])
 
         return output
