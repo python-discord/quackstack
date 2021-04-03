@@ -1,15 +1,15 @@
-from fastapi import FastAPI
-from typing import Optional
 from hashlib import sha1
-from pathlib import Path
 from json import dumps
-from time import time
 from os import getenv
+from pathlib import Path
+from time import time
+from typing import Any, Dict, Optional
 
+from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from src.models import DuckRequest
 from src.generator import DuckBuilder
+from src.models import DuckRequest
 
 
 CACHE = Path(getenv("LOCATION", "./static"))
@@ -20,13 +20,15 @@ app = FastAPI(docs_url=None)
 
 app.mount("/static", StaticFiles(directory=CACHE), name="static")
 
-def dicthash(data: dict):
+
+def dicthash(data: dict) -> str:
+    """Take a dictionary and convert it to a SHA-1 hash."""
     return sha1(dumps(data).encode()).hexdigest()
 
-@app.get("/duck")
-async def get_duck(duck: Optional[DuckRequest] = None):
-    """Create a new duck."""
 
+@app.get("/duck")
+async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
+    """Create a new duck."""
     if duck:
         dh = dicthash(duck.dict())
         file = CACHE / f"{dh}.png"
@@ -41,10 +43,10 @@ async def get_duck(duck: Optional[DuckRequest] = None):
 
     return {"file": f"/static/{dh}.png"}
 
-@app.get("/details")
-async def get_details():
-    """Get details about accessories which can be used to build ducks."""
 
+@app.get("/details")
+async def get_details() -> Dict[str, Any]:
+    """Get details about accessories which can be used to build ducks."""
     return {
         "hats": list(DuckBuilder.hats.keys()),
         "outfits": list(DuckBuilder.outfits.keys()),
