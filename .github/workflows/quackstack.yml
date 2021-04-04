@@ -1,4 +1,4 @@
-name: Lint
+name: Duckinuous Quackration
 
 on:
   push:
@@ -6,10 +6,9 @@ on:
       - main
   pull_request:
 
-
 jobs:
   lint:
-    name: Run pre-commit & flake8
+    name: DuckLint
     runs-on: ubuntu-latest
     env:
       # Configure pip to cache dependencies and do a user install
@@ -86,3 +85,76 @@ jobs:
       - name: Run flake8
         run: "flake8 \
         --format='::error file=%(path)s,line=%(row)d,col=%(col)d::[flake8] %(code)s: %(text)s'"
+
+  build:
+    name: Build & Quack
+    runs-on: ubuntu-latest
+
+    needs: [lint]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Create SHA Container Tag
+        id: sha_tag
+        run: |
+          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
+          echo "::set-output name=tag::$tag"
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN  }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          cache-from: type=registry,ref=ghcr.io/python-discord/quackstack:main
+          tags: |
+            ghcr.io/python-discord/quackstack:main
+            ghcr.io/python-discord/quackstack:${{ steps.sha_tag.outputs.tag }}
+
+  deploy:
+    name: Continuous Ducky
+    runs-on: ubuntu-latest
+
+    needs: [build]
+
+    steps:
+      - name: Create SHA Container Tag
+        id: sha_tag
+        run: |
+          tag=$(cut -c 1-7 <<< $GITHUB_SHA)
+          echo "::set-output name=tag::$tag"
+
+      # Check out the private Kubernetes repository for the
+      # deployment.yaml file using a GitHub Personal Access
+      # Token to get access.
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          repository: python-discord/kubernetes
+          token: ${{ secrets.REPO_TOKEN }}
+
+      - name: Authenticate with Kubernetes
+        uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Deploy to Kubernetes
+        uses: Azure/k8s-deploy@v1
+        with:
+          manifests: |
+              quackstack/deployment.yaml
+          images: 'ghcr.io/python-discord/quackstack:${{ steps.sha_tag.outputs.tag }}'
+          kubectl-version: 'latest'
