@@ -119,6 +119,7 @@ jobs:
           file: ./Dockerfile
           push: true
           cache-from: type=registry,ref=ghcr.io/python-discord/quackstack:main
+          cache-to: type=inline
           tags: |
             ghcr.io/python-discord/quackstack:main
             ghcr.io/python-discord/quackstack:${{ steps.sha_tag.outputs.tag }}
