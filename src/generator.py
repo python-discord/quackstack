@@ -8,7 +8,7 @@ from fastapi import HTTPException
 from .models import DuckRequest
 
 
-ASSETS_PATH = Path("branding/quackstack")
+ASSETS_PATH = Path("duck-builder")
 DUCK_SIZE = (499, 600)
 
 
@@ -16,16 +16,16 @@ class DuckBuilder:
     """A class used to build new ducks."""
 
     templates = {
-        int(filename.name[0]): Image.open(filename) for filename in (ASSETS_PATH / "silverduck_templates").iterdir()
+        int(filename.name[0]): Image.open(filename) for filename in (ASSETS_PATH / "ducky/templates").iterdir()
     }
     hats = {
-        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/hats").iterdir()
+        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "ducky/accessories/hats").iterdir()
     }
     equipments = {
-        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/equipment").iterdir()
+        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "ducky/accessories/equipment").iterdir()
     }
     outfits = {
-        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
+        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "ducky/accessories/outfits").iterdir()
     }
 
     @staticmethod
