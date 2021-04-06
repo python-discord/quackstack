@@ -8,9 +8,9 @@ from typing import Any, Dict, Optional
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-from src.generator import DuckBuilder
+from src.ducky import DuckBuilder
+from src.manducky import ManDuckGenerator
 from src.models import DuckRequest
-
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
@@ -40,6 +40,18 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
         file = CACHE / f"{dh}.png"
 
         DuckBuilder.generate().save(file)
+
+    return {"file": f"/static/{dh}.png"}
+
+
+@app.get("/manduck")
+async def get_man_duck() -> Dict[str, Any]:
+    """Create a new man_duck."""
+    dh = sha1(str(time()).encode()).hexdigest()
+
+    ducky = DuckBuilder.generate()
+    ducky = ManDuckGenerator(ducky).generate()
+    ducky.image.save(CACHE / f"{dh}.png")
 
     return {"file": f"/static/{dh}.png"}
 

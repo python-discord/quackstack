@@ -1,3 +1,4 @@
+from collections import namedtuple
 from pathlib import Path
 from random import choice, randint
 from typing import Dict, Optional, Tuple
@@ -8,32 +9,35 @@ from fastapi import HTTPException
 from .models import DuckRequest
 
 
-ASSETS_PATH = Path("duck-builder")
+ASSETS_PATH = Path("duck-builder", "ducky")
 DUCK_SIZE = (499, 600)
+
+ProceduralDucky = namedtuple("ProceduralDucky", "image colors hat equipment outfit")
+DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
 
 
 class DuckBuilder:
     """A class used to build new ducks."""
 
     templates = {
-        int(filename.name[0]): Image.open(filename) for filename in (ASSETS_PATH / "ducky/templates").iterdir()
+        int(filename.name[0]): Image.open(filename) for filename in (ASSETS_PATH / "templates").iterdir()
     }
     hats = {
-        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "ducky/accessories/hats").iterdir()
+        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/hats").iterdir()
     }
     equipments = {
-        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "ducky/accessories/equipment").iterdir()
+        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/equipment").iterdir()
     }
     outfits = {
-        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "ducky/accessories/outfits").iterdir()
+        filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
     }
 
     @staticmethod
-    def validate_rgb(name: str, data: dict) -> bool:
+    def validate_rgb(name: str, data: dict) -> Tuple[int, int, int]:
         """Validate that the provided data dictionary has compliant RGB values (0-255)."""
         if not all(0 <= value <= 255 for value in data.values()):
             raise HTTPException(400, f"Invalid RGB values given for {name}")
-        return (data["r"], data["g"], data["b"])
+        return data["r"], data["g"], data["b"]
 
     @staticmethod
     def random_rgb() -> Dict[str, int]:
@@ -74,6 +78,7 @@ class DuckBuilder:
         eye = cls.validate_rgb("eye", options["eye"])
         beak = cls.validate_rgb("beak", options["beak"])
         eye_wing = cls.validate_rgb("eye_wing", options["eye_wing"])
+        colors = DuckyColors(eye, eye_wing, wing, body, beak)
 
         accessories = options["accessories"]
         equipment = accessories["equipment"]
@@ -95,9 +100,9 @@ class DuckBuilder:
                 layer = ImageChops.multiply(layer, Image.new("RGBA", DUCK_SIZE, color=recolor))
             output.alpha_composite(layer)
 
-        apply_layer(cls.templates[5], beak)
-        apply_layer(cls.templates[4], body)
-        apply_layer(cls.templates[1], eye)
+        apply_layer(cls.templates[5], colors.beak)
+        apply_layer(cls.templates[4], colors.body)
+        apply_layer(cls.templates[1], colors.eye)
 
         if outfit:
             apply_layer(cls.outfits[outfit])
@@ -105,10 +110,16 @@ class DuckBuilder:
         if equipment:
             apply_layer(cls.equipments[equipment])
 
-        apply_layer(cls.templates[3], wing)
-        apply_layer(cls.templates[2], eye_wing)
+        apply_layer(cls.templates[3], colors.wing)
+        apply_layer(cls.templates[2], colors.eye_wing)
 
         if hat:
             apply_layer(cls.hats[hat])
 
-        return output
+        return ProceduralDucky(
+            output,
+            colors,
+            hat,
+            equipment,
+            outfit
+        )
