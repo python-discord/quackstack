@@ -1,14 +1,14 @@
 import random
 from collections import namedtuple
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
-from fastapi import HTTPException
+
+from .colors import make_man_duck_colors
 
 ManDucky = namedtuple("ManDucky", "image hat equipment outfit")
 ProceduralDucky = namedtuple("ProceduralDucky", "image colors hat equipment outfit")
-DressColors = namedtuple("DressColors", "shirt pants")
 Color = Tuple[int, int, int]
 
 ASSETS_PATH = Path("duck-builder", "duck-person")
@@ -54,21 +54,20 @@ class ManDuckGenerator:
 
     def generate(self) -> ManDucky:
         """Actually generate the ducky."""
-        pants_color = self.validate_rgb("body", self.random_rgb())
-        shirt_color = self.validate_rgb("wing", self.random_rgb())
+        dress_colors = make_man_duck_colors()
 
         if self.variation == 2:
-            self.apply_layer(self.templates["pants"], pants_color)
+            self.apply_layer(self.templates["pants"], dress_colors.pants)
 
         self.apply_layer(self.templates["bill"], self.colors.beak)
         self.apply_layer(self.templates["head"], self.colors.body)
         self.apply_layer(self.templates["eye"], self.colors.eye)
 
         if self.variation == 2:
-            self.apply_layer(self.templates["shirt"], shirt_color)
+            self.apply_layer(self.templates["shirt"], dress_colors.shirt)
 
         elif self.variation == 1:
-            self.apply_layer(self.templates["dress"], shirt_color)
+            self.apply_layer(self.templates["dress"], dress_colors.shirt)
 
         if self.outfit and self.outfit != "bread":
             self.apply_layer(self.templates["outfit"])
@@ -91,21 +90,3 @@ class ManDuckGenerator:
         if recolor:
             layer = ImageChops.multiply(layer, Image.new("RGBA", MAN_DUCKY_SIZE, color=recolor))
         self.output.alpha_composite(layer)
-
-    @staticmethod
-    def validate_rgb(name: str, data: dict) -> Tuple[int, int, int]:
-        """Validate that the provided data dictionary has compliant RGB values (0-255)."""
-        if not all(0 <= value <= 255 for value in data.values()):
-            raise HTTPException(400, f"Invalid RGB values given for {name}")
-        return data["r"], data["g"], data["b"]
-
-    @staticmethod
-    def random_rgb() -> Dict[str, int]:
-        """Generate a random RGB colour."""
-        # TODO: refactor this to use colorsys for nicer colours.
-
-        return {
-            "r": random.randint(0, 255),
-            "g": random.randint(0, 255),
-            "b": random.randint(0, 255),
-        }

@@ -1,11 +1,12 @@
 from collections import namedtuple
 from pathlib import Path
-from random import choice, randint
-from typing import Dict, Optional, Tuple
+from random import choice
+from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
 from fastapi import HTTPException
 
+from .colors import make_duck_colors
 from .models import DuckRequest
 
 
@@ -32,33 +33,11 @@ class DuckBuilder:
         filename.stem: Image.open(filename) for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
     }
 
-    @staticmethod
-    def validate_rgb(name: str, data: dict) -> Tuple[int, int, int]:
-        """Validate that the provided data dictionary has compliant RGB values (0-255)."""
-        if not all(0 <= value <= 255 for value in data.values()):
-            raise HTTPException(400, f"Invalid RGB values given for {name}")
-        return data["r"], data["g"], data["b"]
-
-    @staticmethod
-    def random_rgb() -> Dict[str, int]:
-        """Generate a random RGB colour."""
-        # TODO: refactor this to use colorsys for nicer colours.
-
-        return {
-            "r": randint(0, 255),
-            "g": randint(0, 255),
-            "b": randint(0, 255),
-        }
-
     @classmethod
     def make_random(cls):
         """Generate a random RGB duck structure."""
         return {
-            "body": cls.random_rgb(),
-            "wing": cls.random_rgb(),
-            "eye": cls.random_rgb(),
-            "beak": cls.random_rgb(),
-            "eye_wing": cls.random_rgb(),
+            "colors": make_duck_colors(),
             "accessories": {
                 "hat": choice([*list(cls.hats), None]),
                 "outfit": choice([*list(cls.outfits), None]),
@@ -70,15 +49,9 @@ class DuckBuilder:
     def generate(cls, options: Optional[DuckRequest] = None):
         """Generate a duck from the provided request, else generate a random one."""
         options = options.dict() if options else cls.make_random()
+        colors = options["colors"]
 
         output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
-
-        body = cls.validate_rgb("body", options["body"])
-        wing = cls.validate_rgb("wing", options["wing"])
-        eye = cls.validate_rgb("eye", options["eye"])
-        beak = cls.validate_rgb("beak", options["beak"])
-        eye_wing = cls.validate_rgb("eye_wing", options["eye_wing"])
-        colors = DuckyColors(eye, eye_wing, wing, body, beak)
 
         accessories = options["accessories"]
         equipment = accessories["equipment"]
