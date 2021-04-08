@@ -12,6 +12,4 @@ RUN poetry install
 
 COPY . /app
 
-RUN git submodule update --init
-
 CMD ["poetry", "run", "hypercorn", "main:app", "--bind", "0.0.0.0:80"]
