@@ -34,12 +34,12 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
         file = CACHE / f"{dh}.png"
 
         if not file.exists():
-            DuckBuilder.generate(duck).save(file)
+            DuckBuilder.generate(duck).image.save(file)
     else:
         dh = sha1(str(time()).encode()).hexdigest()
         file = CACHE / f"{dh}.png"
 
-        DuckBuilder.generate().save(file)
+        DuckBuilder.generate().image.save(file)
 
     return {"file": f"/static/{dh}.png"}
 
