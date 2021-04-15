@@ -9,7 +9,6 @@ from fastapi import HTTPException
 from .colors import make_duck_colors
 from .models import DuckRequest
 
-
 ASSETS_PATH = Path("duck-builder", "ducky")
 DUCK_SIZE = (499, 600)
 
@@ -36,8 +35,15 @@ class DuckBuilder:
     @classmethod
     def make_random(cls):
         """Generate a random RGB duck structure."""
+        colors = make_duck_colors()
         return {
-            "colors": make_duck_colors(),
+            "colors": {
+                "body": colors.body,
+                "wing": colors.wing,
+                "eye": colors.eye,
+                "beak": colors.beak,
+                "eye_wing": colors.eye_wing
+            },
             "accessories": {
                 "hat": choice([*list(cls.hats), None]),
                 "outfit": choice([*list(cls.outfits), None]),
@@ -49,7 +55,9 @@ class DuckBuilder:
     def generate(cls, options: Optional[DuckRequest] = None):
         """Generate a duck from the provided request, else generate a random one."""
         options = options.dict() if options else cls.make_random()
-        colors = options["colors"]
+
+        # Create `colors` namedtuple
+        colors = DuckyColors(**options["colors"])
 
         output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
 
