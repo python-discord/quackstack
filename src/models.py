@@ -9,6 +9,16 @@ class PartOption(BaseModel):
     r: int
     g: int
     b: int
+        
+        
+class Colors(BaseModel):
+    """Valid options for a ducky colors."""
+
+    body: PartOption
+    wing: PartOption
+    eye: PartOption
+    beak: PartOption
+    eye_wing: PartOption
 
 
 class Accessories(BaseModel):
@@ -21,10 +31,6 @@ class Accessories(BaseModel):
 
 class DuckRequest(BaseModel):
     """A request for a ducky generation."""
-
-    body: PartOption
-    wing: PartOption
-    eye: PartOption
-    beak: PartOption
-    eye_wing: PartOption
+    
+    colors: Colors
     accessories: Accessories
