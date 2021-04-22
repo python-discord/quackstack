@@ -21,6 +21,13 @@ class Colors(BaseModel):
     eye_wing: PartOption
 
 
+class DressColors(BaseModel):
+    """Valid options for a man ducky dress colors."""
+
+    shirt: PartOption
+    pants: Optional[PartOption]
+
+
 class Accessories(BaseModel):
     """Valid accessories for a duck."""
 
@@ -33,4 +40,13 @@ class DuckRequest(BaseModel):
     """A request for a ducky generation."""
 
     colors: Colors
+    accessories: Accessories
+
+
+class ManDuckRequest(BaseModel):
+    """A request for a man ducky generation."""
+
+    variation: int
+    colors: Colors
+    dress_colors: DressColors
     accessories: Accessories

@@ -5,10 +5,11 @@ from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
 
-from .colors import make_man_duck_colors
+from .colors import DressColors, DuckyColors, make_man_duck_colors
+from .ducky import ProceduralDucky
+from .models import ManDuckRequest
 
-ManDucky = namedtuple("ManDucky", "image hat equipment outfit")
-ProceduralDucky = namedtuple("ProceduralDucky", "image colors hat equipment outfit")
+ManDucky = namedtuple("ManDucky", "image")
 Color = Tuple[int, int, int]
 
 ASSETS_PATH = Path("duck-builder", "duck-person")
@@ -18,72 +19,95 @@ MAN_DUCKY_SIZE = (600, 1194)
 class ManDuckGenerator:
     """Temporary class used to generate a ducky human."""
 
-    def __init__(self, ducky: ProceduralDucky) -> None:
+    def __init__(self):
         self.output: Image.Image = Image.new("RGBA", MAN_DUCKY_SIZE, color=(0, 0, 0, 0))
-        self.colors = ducky.colors
 
-        self.variation = random.choice((1, 2))
+    @staticmethod
+    def generate_tempalte(
+            ducky: ProceduralDucky, dress_colors: DressColors, variation_: int
+    ) -> dict:
+        """Generate a man duck structure from given configuration."""
+        variation = f"variation_{variation_}"
+        print(dress_colors)
 
-        self.templates = {
-            "head": Image.open(ASSETS_PATH / "templates/head.png"),
-            "eye": Image.open(ASSETS_PATH / "templates/eye.png"),
-            "bill": Image.open(ASSETS_PATH / "templates/bill.png"),
-            "hands": Image.open(ASSETS_PATH / f"templates/variation_{self.variation}/hands.png"),
+        template = {
+            "head": (
+                Image.open(ASSETS_PATH / "templates/head.png"),
+                ducky.colors.body
+            ),
+            "eye": (
+                Image.open(ASSETS_PATH / "templates/eye.png"),
+                ducky.colors.eye
+            ),
+            "bill": (
+                Image.open(ASSETS_PATH / "templates/bill.png"),
+                ducky.colors.beak
+            ),
+            "hands": (
+                Image.open(ASSETS_PATH / f"templates/{variation}/hands.png"),
+                ducky.colors.wing
+            )
         }
 
-        if self.variation == 1:
-            self.templates["dress"] = Image.open(ASSETS_PATH / "templates/variation_1/dress.png")
-        if self.variation == 2:
-            self.templates["shirt"] = Image.open(ASSETS_PATH / "templates/variation_2/shirt.png")
-            self.templates["pants"] = Image.open(ASSETS_PATH / "templates/variation_2/pants.png")
+        if variation_ == 1:
+            template["dress"] = (
+                Image.open(ASSETS_PATH / "templates/variation_1/dress.png"),
+                dress_colors.shirt
+            )
+        else:
+            template['shirt'] = (
+                Image.open(ASSETS_PATH / "templates/variation_2/shirt.png"),
+                dress_colors.shirt
+            )
+            template['pants'] = (
+                Image.open(ASSETS_PATH / "templates/variation_2/pants.png"),
+                dress_colors.pants
+            )
 
         if ducky.hat:
-            self.templates["hat"] = Image.open(ASSETS_PATH / f"accessories/hats/{ducky.hat}.png")
+            template["hat"] = (
+                Image.open(ASSETS_PATH / f"accessories/hats/{ducky.hat}.png"),
+            )
         if ducky.outfit:
-            self.templates["outfit"] = Image.open(
-                ASSETS_PATH / f"outfits/variation_{self.variation}/{ducky.outfit}.png"
+            template["outfit"] = (
+                Image.open(ASSETS_PATH / f"outfits/{variation}/{ducky.outfit}.png"),
             )
         if ducky.equipment:
-            self.templates["equipment"] = Image.open(
-                ASSETS_PATH / f"equipment/variation_{self.variation}/{ducky.equipment}.png"
+            template["equipment"] = (
+                Image.open(ASSETS_PATH / f"equipment/{variation}/{ducky.equipment}.png"),
             )
 
-        self.hat = ducky.hat
-        self.equipment = ducky.equipment
-        self.outfit = ducky.outfit
+        return template
 
-    def generate(self) -> ManDucky:
-        """Actually generate the ducky."""
-        dress_colors = make_man_duck_colors()
+    def generate_from_options(self, options: Optional[ManDuckRequest]) -> dict:
+        """Generate a man duck from the provided request."""
+        colors = DuckyColors(**options["colors"])
+        accessories = options["accessories"]
 
-        if self.variation == 2:
-            self.apply_layer(self.templates["pants"], dress_colors.pants)
+        return self.generate_tempalte(
+            ducky=ProceduralDucky(None, colors, **accessories),
+            dress_colors=DressColors(**options["dress_colors"]),
+            variation_=options['variation']
+        )
 
-        self.apply_layer(self.templates["bill"], self.colors.beak)
-        self.apply_layer(self.templates["head"], self.colors.body)
-        self.apply_layer(self.templates["eye"], self.colors.eye)
+    def generate(
+            self,
+            *,
+            options: Optional[ManDuckRequest] = None,
+            ducky: Optional[ProceduralDucky] = None
+    ) -> ManDucky:
+        """Actually generate the man ducky from the provided request, else generate a random one.."""
+        if options:
+            template = self.generate_from_options(options)
+        else:
+            template = self.generate_tempalte(
+                ducky, make_man_duck_colors(), random.choice((1, 2))
+            )
 
-        if self.variation == 2:
-            self.apply_layer(self.templates["shirt"], dress_colors.shirt)
+        for item in template.values():
+            self.apply_layer(*item)
 
-        elif self.variation == 1:
-            self.apply_layer(self.templates["dress"], dress_colors.shirt)
-
-        if self.outfit and self.outfit != "bread":
-            self.apply_layer(self.templates["outfit"])
-
-        if self.equipment:
-            self.apply_layer(self.templates["equipment"])
-
-        self.apply_layer(self.templates["hands"], self.colors.wing)
-
-        if self.outfit and self.outfit == "beard":
-            self.apply_layer(self.templates["outfit"])
-
-        if self.hat:
-            self.apply_layer(self.templates["hat"])
-
-        return ManDucky(self.output, self.hat, self.equipment, self.outfit)
+        return ManDucky(self.output)
 
     def apply_layer(self, layer: Image.Image, recolor: Optional[Color] = None) -> None:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
