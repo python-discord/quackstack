@@ -6,14 +6,13 @@ from typing import Optional, Tuple
 from PIL import Image, ImageChops
 from fastapi import HTTPException
 
-from .colors import make_duck_colors
+from .colors import DuckyColors, make_duck_colors
 from .models import DuckRequest
 
 ASSETS_PATH = Path("duck-builder", "ducky")
 DUCK_SIZE = (499, 600)
 
 ProceduralDucky = namedtuple("ProceduralDucky", "image colors hat equipment outfit")
-DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
 
 
 class DuckBuilder:
