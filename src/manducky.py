@@ -1,3 +1,4 @@
+import os
 import random
 from collections import namedtuple
 from pathlib import Path
@@ -114,7 +115,10 @@ class ManDuckGenerator:
         try:
             layer = Image.open(layer_path)
         except FileNotFoundError:
-            raise HTTPException(400, "Invalid option provided.")
+            raise HTTPException(
+                400,
+                f"Invalid option provided: {os.path.basename(layer_path)} not found."
+            )
 
         if recolor:
             if isinstance(recolor, dict):
