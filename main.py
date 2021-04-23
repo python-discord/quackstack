@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
 from src.manducky import ManDuckGenerator
-from src.models import DuckRequest
+from src.models import DuckRequest, ManDuckRequest
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
@@ -45,13 +45,22 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
 
 
 @app.get("/manduck")
-async def get_man_duck() -> Dict[str, Any]:
+async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, Any]:
     """Create a new man_duck."""
-    dh = sha1(str(time()).encode()).hexdigest()
+    if manduck:
+        dh = dicthash(manduck.dict())
+        file = CACHE / f"{dh}.png"
 
-    ducky = DuckBuilder.generate()
-    ducky = ManDuckGenerator(ducky).generate()
-    ducky.image.save(CACHE / f"{dh}.png")
+        if not file.exists():
+            ducky = ManDuckGenerator().generate(options=manduck)
+            ducky.image.save(CACHE / f"{dh}.png")
+
+    else:
+        dh = sha1(str(time()).encode()).hexdigest()
+
+        ducky = DuckBuilder.generate()
+        ducky = ManDuckGenerator().generate(ducky=ducky)
+        ducky.image.save(CACHE / f"{dh}.png")
 
     return {"file": f"/static/{dh}.png"}
 
