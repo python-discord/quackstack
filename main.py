@@ -16,7 +16,7 @@ CACHE = Path(getenv("LOCATION", "./static"))
 
 CACHE.mkdir(exist_ok=True)
 
-app = FastAPI(docs_url=None)
+app = FastAPI()
 
 app.mount("/static", StaticFiles(directory=CACHE), name="static")
 
