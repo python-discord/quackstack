@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
+from fastapi import HTTPException
 
 from .colors import DressColors, DuckyColors, make_man_duck_colors
 from .ducky import ProceduralDucky
@@ -31,49 +32,49 @@ class ManDuckGenerator:
 
         template = {
             "head": (
-                Image.open(ASSETS_PATH / "templates/head.png"),
+                ASSETS_PATH / "templates/head.png",
                 ducky.colors.body
             ),
             "eye": (
-                Image.open(ASSETS_PATH / "templates/eye.png"),
+                ASSETS_PATH / "templates/eye.png",
                 ducky.colors.eye
             ),
             "bill": (
-                Image.open(ASSETS_PATH / "templates/bill.png"),
+                ASSETS_PATH / "templates/bill.png",
                 ducky.colors.beak
             ),
             "hands": (
-                Image.open(ASSETS_PATH / f"templates/{variation}/hands.png"),
+                ASSETS_PATH / f"templates/{variation}/hands.png",
                 ducky.colors.wing
             )
         }
 
         if variation_ == 1:
             template["dress"] = (
-                Image.open(ASSETS_PATH / "templates/variation_1/dress.png"),
+                ASSETS_PATH / "templates/variation_1/dress.png",
                 dress_colors.shirt
             )
         else:
             template['shirt'] = (
-                Image.open(ASSETS_PATH / "templates/variation_2/shirt.png"),
+                ASSETS_PATH / "templates/variation_2/shirt.png",
                 dress_colors.shirt
             )
             template['pants'] = (
-                Image.open(ASSETS_PATH / "templates/variation_2/pants.png"),
+                ASSETS_PATH / "templates/variation_2/pants.png",
                 dress_colors.pants
             )
 
         if ducky.hat:
             template["hat"] = (
-                Image.open(ASSETS_PATH / f"accessories/hats/{ducky.hat}.png"),
+                ASSETS_PATH / f"accessories/hats/{ducky.hat}.png",
             )
         if ducky.outfit:
             template["outfit"] = (
-                Image.open(ASSETS_PATH / f"outfits/{variation}/{ducky.outfit}.png"),
+                ASSETS_PATH / f"outfits/{variation}/{ducky.outfit}.png",
             )
         if ducky.equipment:
             template["equipment"] = (
-                Image.open(ASSETS_PATH / f"equipment/{variation}/{ducky.equipment}.png"),
+                ASSETS_PATH / f"equipment/{variation}/{ducky.equipment}.png",
             )
 
         return template
@@ -90,8 +91,8 @@ class ManDuckGenerator:
         )
 
     def generate(
-            self,
-            *,
+        self,
+        *,
             options: Optional[ManDuckRequest] = None,
             ducky: Optional[ProceduralDucky] = None
     ) -> ManDucky:
@@ -108,8 +109,13 @@ class ManDuckGenerator:
 
         return ManDucky(self.output)
 
-    def apply_layer(self, layer: Image.Image, recolor: Optional[Color] = None) -> None:
+    def apply_layer(self, layer_path: str, recolor: Optional[Color] = None) -> None:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
+        try:
+            layer = Image.open(layer_path)
+        except FileNotFoundError:
+            raise HTTPException(400, "Invalid option provided.")
+
         if recolor:
             if isinstance(recolor, dict):
                 recolor = tuple(recolor.values())
