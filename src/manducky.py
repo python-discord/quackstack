@@ -102,7 +102,7 @@ class ManDuckGenerator:
             template = self.generate_from_options(options.dict())
         else:
             template = self.generate_tempalte(
-                ducky, make_man_duck_colors(), random.choice((1, 2))
+                    ducky, make_man_duck_colors(ducky.colors.body), random.choice((1, 2))
             )
 
         for item in template.values():
