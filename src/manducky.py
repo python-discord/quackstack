@@ -28,7 +28,6 @@ class ManDuckGenerator:
     ) -> dict:
         """Generate a man duck structure from given configuration."""
         variation = f"variation_{variation_}"
-        print(dress_colors)
 
         template = {
             "head": (
@@ -79,7 +78,7 @@ class ManDuckGenerator:
 
         return template
 
-    def generate_from_options(self, options: Optional[ManDuckRequest]) -> dict:
+    def generate_from_options(self, options: dict) -> dict:
         """Generate a man duck from the provided request."""
         colors = DuckyColors(**options["colors"])
         accessories = options["accessories"]
@@ -98,7 +97,7 @@ class ManDuckGenerator:
     ) -> ManDucky:
         """Actually generate the man ducky from the provided request, else generate a random one.."""
         if options:
-            template = self.generate_from_options(options)
+            template = self.generate_from_options(options.dict())
         else:
             template = self.generate_tempalte(
                 ducky, make_man_duck_colors(), random.choice((1, 2))
@@ -112,5 +111,7 @@ class ManDuckGenerator:
     def apply_layer(self, layer: Image.Image, recolor: Optional[Color] = None) -> None:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
         if recolor:
+            if isinstance(recolor, dict):
+                recolor = tuple(recolor.values())
             layer = ImageChops.multiply(layer, Image.new("RGBA", MAN_DUCKY_SIZE, color=recolor))
         self.output.alpha_composite(layer)
