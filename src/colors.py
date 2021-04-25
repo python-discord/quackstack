@@ -1,6 +1,6 @@
 import random
 from collections import namedtuple
-from colorsys import hls_to_rgb
+from colorsys import hls_to_rgb, rgb_to_hls
 from typing import Tuple
 
 DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
@@ -42,13 +42,21 @@ def make_duck_colors() -> DuckyColors:
     return DuckyColors(*colors)
 
 
-def make_man_duck_colors() -> DressColors:
+def make_man_duck_colors(ducky: tuple) -> DressColors:
     """Create a matching DuckyColors object."""
-    hue = random.random()
-    dark_variant = random.choice([True, False])
-    shirt, pants = (make_color(hue, dark_variant) for _ in range(2))
+    hls_ = tuple(rgb_to_hls(ducky[0] / 255, ducky[1] / 255, ducky[2] / 255))
 
-    scalar_colors = [hls_to_rgb(*color_pair) for color_pair in (shirt, pants)]
-    colors = (tuple(int(color * 256) for color in color_pair) for color_pair in scalar_colors)
+    # Find the first triadic hls color
+    first_varient = [((hls_[0] * 360 + 120) % 360) / 360, hls_[1], hls_[2]]
 
-    return DressColors(*colors)
+    # Find the second triadic hls color
+    second_varient = [((hls_[0] * 360 + 240) % 360) / 360, hls_[1], hls_[2]]
+
+    first = tuple(
+        map(lambda x: round(x * 255), hls_to_rgb(first_varient[0], first_varient[1], first_varient[2]))
+    )
+    second = tuple(
+        map(lambda x: round(x * 255), hls_to_rgb(second_varient[0], second_varient[1], second_varient[2]))
+    )
+
+    return DressColors(first, second)
