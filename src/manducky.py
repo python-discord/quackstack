@@ -32,6 +32,10 @@ class ManDuckGenerator:
         variation = f"variation_{variation_}"
 
         template = {
+            "bill": (
+                ASSETS_PATH / "templates/bill.png",
+                ducky.colors.beak
+            ),
             "head": (
                 ASSETS_PATH / "templates/head.png",
                 ducky.colors.body
@@ -39,10 +43,6 @@ class ManDuckGenerator:
             "eye": (
                 ASSETS_PATH / "templates/eye.png",
                 ducky.colors.eye
-            ),
-            "bill": (
-                ASSETS_PATH / "templates/bill.png",
-                ducky.colors.beak
             ),
             "hands": (
                 ASSETS_PATH / f"templates/{variation}/hands.png",
