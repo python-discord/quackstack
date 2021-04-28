@@ -34,12 +34,12 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
         file = CACHE / f"{dh}.png"
 
         if not file.exists():
-            DuckBuilder.generate(duck).image.save(file)
+            DuckBuilder().generate(options=duck).image.save(file)
     else:
         dh = sha1(str(time()).encode()).hexdigest()
         file = CACHE / f"{dh}.png"
 
-        DuckBuilder.generate().image.save(file)
+        DuckBuilder().generate().image.save(file)
 
     return {"file": f"/static/{dh}.png"}
 
@@ -58,7 +58,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, An
     else:
         dh = sha1(str(time()).encode()).hexdigest()
 
-        ducky = DuckBuilder.generate()
+        ducky = DuckBuilder().generate()
         ducky = ManDuckGenerator().generate(ducky=ducky)
         ducky.image.save(CACHE / f"{dh}.png")
 
