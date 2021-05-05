@@ -78,7 +78,7 @@ class DuckBuilder:
         for item in template.values():
             self.apply_layer(*item)
 
-        return ProceduralDucky(self.output, colors, hat, outfit, equipment)
+        return ProceduralDucky(self.output, colors, hat, equipment, outfit)
 
     def apply_layer(self, layer_path: str, recolor: Optional[Tuple[int, int, int]] = None) -> None:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
