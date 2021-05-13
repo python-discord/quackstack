@@ -16,7 +16,7 @@ CACHE = Path(getenv("LOCATION", "./static"))
 
 CACHE.mkdir(exist_ok=True)
 
-app = FastAPI()
+app = FastAPI(docs_url="swagger_docs", redoc_url="/docs")
 
 app.mount("/static", StaticFiles(directory=CACHE), name="static")
 
