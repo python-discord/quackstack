@@ -65,7 +65,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, An
     return {"file": f"/static/{dh}.png"}
 
 
-@app.get("/details")
+@app.get("/details/{type}")
 async def get_details(type: Optional[str] = None) -> dict:
     """Get details about accessories which can be used to build ducks/man-ducks."""
     details = {
