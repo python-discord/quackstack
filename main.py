@@ -87,5 +87,5 @@ async def get_details(type: Optional[str] = None) -> dict:
     }
 
     if type:
-        return details.get(type) or {"message": "Requested type is not available"}
+        return details.get(type, {"message": "Requested type is not available"})
     return details
