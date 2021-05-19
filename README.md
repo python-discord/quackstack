@@ -8,7 +8,7 @@ An on-demand procedural ducky delivery service. An infinite stack of duckies!
 
 1. Install Poetry with `pip install poetry`
 2. Install the dependencies with Poetry: `poetry install`
-3. Run the server: `poetry run hypercorn main:app --bind 127.0.0.1:8077`
+3. Run the server: `poetry run uvicorn main:app --host 127.0.0.1 --port 8077`
 
 ### Docker Compose
 
