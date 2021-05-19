@@ -65,11 +65,27 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, An
     return {"file": f"/static/{dh}.png"}
 
 
-@app.get("/details")
-async def get_details() -> Dict[str, Any]:
-    """Get details about accessories which can be used to build ducks."""
-    return {
-        "hats": list(DuckBuilder.hats.keys()),
-        "outfits": list(DuckBuilder.outfits.keys()),
-        "equipments": list(DuckBuilder.equipments.keys()),
+@app.get("/details/{type}")
+async def get_details(type: Optional[str] = None) -> dict:
+    """Get details about accessories which can be used to build ducks/man-ducks."""
+    details = {
+        "ducky": {
+            "hats": list(DuckBuilder.hats),
+            "outfits": list(DuckBuilder.outfits),
+            "equipments": list(DuckBuilder.equipments)
+        },
+        "man-duck": {
+            "hats": list(ManDuckGenerator.HATS),
+            "outfits": {
+                variation: list(outfit) for variation, outfit in ManDuckGenerator.OUTFITS.items()
+            },
+            "equipments": {
+                variation: list(equipment) for variation, equipment in ManDuckGenerator.EQUIPMENTS.items()
+            },
+            "variations": list(ManDuckGenerator.VARIATIONS)
+        }
     }
+
+    if type:
+        return details.get(type, {"message": "Requested type is not available"})
+    return details

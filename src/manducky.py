@@ -21,12 +21,32 @@ MAN_DUCKY_SIZE = (600, 1194)
 class ManDuckGenerator:
     """Temporary class used to generate a ducky human."""
 
+    VARIATIONS = (1, 2)
+    HATS = {
+        filename.stem: filename for filename in (ASSETS_PATH / "accessories/hats").iterdir()
+    }
+    OUTFITS = {
+        "variation_1": {
+            filename.stem: filename for filename in (ASSETS_PATH / "outfits/variation_1").iterdir()
+        },
+        "variation_2": {
+            filename.stem: filename for filename in (ASSETS_PATH / "outfits/variation_2").iterdir()
+        }
+    }
+    EQUIPMENTS = {
+        "variation_1": {
+            filename.stem: filename for filename in (ASSETS_PATH / "equipment/variation_1").iterdir()
+        },
+        "variation_2": {
+            filename.stem: filename for filename in (ASSETS_PATH / "equipment/variation_2").iterdir()
+        }
+    }
+
     def __init__(self):
         self.output: Image.Image = Image.new("RGBA", MAN_DUCKY_SIZE, color=(0, 0, 0, 0))
 
-    @staticmethod
     def generate_tempalte(
-            ducky: ProceduralDucky, dress_colors: DressColors, variation_: int
+            self, ducky: ProceduralDucky, dress_colors: DressColors, variation_: int
     ) -> dict:
         """Generate a man duck structure from given configuration."""
         variation = f"variation_{variation_}"
@@ -66,18 +86,11 @@ class ManDuckGenerator:
             )
 
         if ducky.hat:
-            template["hat"] = (
-                ASSETS_PATH / f"accessories/hats/{ducky.hat}.png",
-            )
+            template["hat"] = (self.HATS[ducky.hat],)
         if ducky.outfit:
-            template["outfit"] = (
-                ASSETS_PATH / f"outfits/{variation}/{ducky.outfit}.png",
-            )
+            template["outfit"] = (self.OUTFITS[variation][ducky.outfit],)
         if ducky.equipment:
-            template["equipment"] = (
-                ASSETS_PATH / f"equipment/{variation}/{ducky.equipment}.png",
-            )
-
+            template["equipment"] = (self.EQUIPMENTS[variation][ducky.equipment],)
         return template
 
     def generate_from_options(self, options: dict) -> dict:
@@ -102,7 +115,7 @@ class ManDuckGenerator:
             template = self.generate_from_options(options.dict())
         else:
             template = self.generate_tempalte(
-                ducky, make_man_duck_colors(ducky.colors.body), random.choice((1, 2))
+                ducky, make_man_duck_colors(ducky.colors.body), random.choice(self.VARIATIONS)
             )
 
         for item in template.values():
