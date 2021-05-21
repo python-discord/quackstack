@@ -27,18 +27,18 @@ class ManDuckGenerator:
     }
     OUTFITS = {
         "variation_1": {
-            filename.stem: filename for filename in (ASSETS_PATH / "outfits/variation_1").iterdir()
+            filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits/variation_1").iterdir()
         },
         "variation_2": {
-            filename.stem: filename for filename in (ASSETS_PATH / "outfits/variation_2").iterdir()
+            filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits/variation_2").iterdir()
         }
     }
     EQUIPMENTS = {
         "variation_1": {
-            filename.stem: filename for filename in (ASSETS_PATH / "equipment/variation_1").iterdir()
+            filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment/variation_1").iterdir()
         },
         "variation_2": {
-            filename.stem: filename for filename in (ASSETS_PATH / "equipment/variation_2").iterdir()
+            filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment/variation_2").iterdir()
         }
     }
 
