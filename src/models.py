@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import List, Optional
 
 from pydantic import BaseModel
 
@@ -53,21 +53,29 @@ class ManDuckRequest(BaseModel):
 
 
 class DuckResponse(BaseModel):
+    """The generated ducky file location."""
+
     file: str
 
 
 class DuckyDetails(BaseModel):
+    """Details of available ducky creation assets."""
+
     hats: List[str]
     outfits: List[str]
     equipments: List[str]
 
 
 class ManduckVariations(BaseModel):
+    """Details of available manduck variations."""
+
     variation_1: List[str]
     variation_2: List[str]
 
 
 class ManduckDetails(BaseModel):
+    """Details of available manduck creation assets."""
+
     hats: List[str]
     outfits: ManduckVariations
     equipments: ManduckVariations
