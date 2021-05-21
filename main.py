@@ -3,9 +3,9 @@ from json import dumps
 from os import getenv
 from pathlib import Path
 from time import time
-from typing import Any, Dict, Optional, Union
+from typing import Optional, Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
@@ -66,7 +66,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse
 
 
 @app.get("/details/{type}", response_model=Union[ManduckDetails, DuckyDetails])
-async def get_details(type: Optional[str] = None) -> Union[ManduckDetails, DuckyDetails]:
+async def get_details(type: str = None) -> Union[ManduckDetails, DuckyDetails]:
     """Get details about accessories which can be used to build ducks/man-ducks."""
 
     details = {
@@ -89,6 +89,4 @@ async def get_details(type: Optional[str] = None) -> Union[ManduckDetails, Ducky
         )
     }
 
-    if type:
-        return details.get(type, {"message": "Requested type is not available"})
-    return details
+    return details.get(type, Response("Requested type is not available", 400))
