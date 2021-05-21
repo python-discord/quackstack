@@ -66,7 +66,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse
 
 
 @app.get("/details/{type}", response_model=Union[ManduckDetails, DuckyDetails])
-async def get_details(type: str = None) -> Union[ManduckDetails, DuckyDetails]:
+async def get_details(type: str) -> Union[ManduckDetails, DuckyDetails]:
     """Get details about accessories which can be used to build ducks/man-ducks."""
     details = {
         "ducky": DuckyDetails(
