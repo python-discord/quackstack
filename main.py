@@ -5,7 +5,7 @@ from pathlib import Path
 from time import time
 from typing import Any, Dict, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
@@ -65,10 +65,10 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, An
     return {"file": f"/static/{dh}.png"}
 
 
-@app.get("/details/{type}")
-async def get_details(type: Optional[str] = None) -> dict:
+@app.get("/details")
+async def get_details() -> dict:
     """Get details about accessories which can be used to build ducks/man-ducks."""
-    details = {
+    return {
         "ducky": {
             "hats": list(DuckBuilder.hats),
             "outfits": list(DuckBuilder.outfits),
@@ -86,6 +86,12 @@ async def get_details(type: Optional[str] = None) -> dict:
         }
     }
 
-    if type:
-        return details.get(type, {"message": "Requested type is not available"})
-    return details
+
+@app.get("/details/{type}")
+async def get_details_type(type: str) -> dict:
+    """Get details about the accessories that can be used to build type of duck."""
+    details = await get_details()
+
+    if details := details.get(type):
+        return details
+    raise HTTPException(400, "Requested type is not available")
