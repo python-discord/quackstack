@@ -3,14 +3,14 @@ from json import dumps
 from os import getenv
 from pathlib import Path
 from time import time
-from typing import Any, Dict, Optional
+from typing import Optional, Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
 from src.manducky import ManDuckGenerator
-from src.models import DuckRequest, ManDuckRequest
+from src.models import DuckRequest, DuckResponse, DuckyDetails, ManDuckRequest, ManduckDetails, ManduckVariations
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
@@ -26,8 +26,8 @@ def dicthash(data: dict) -> str:
     return sha1(dumps(data).encode()).hexdigest()
 
 
-@app.get("/duck")
-async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
+@app.get("/duck", response_model=DuckResponse)
+async def get_duck(duck: Optional[DuckRequest] = None) -> DuckResponse:
     """Create a new duck."""
     if duck:
         dh = dicthash(duck.dict())
@@ -41,11 +41,11 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
 
         DuckBuilder().generate().image.save(file)
 
-    return {"file": f"/static/{dh}.png"}
+    return DuckResponse(file=f"/static/{dh}.png")
 
 
-@app.get("/manduck")
-async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, Any]:
+@app.get("/manduck", response_model=DuckResponse)
+async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse:
     """Create a new man_duck."""
     if manduck:
         dh = dicthash(manduck.dict())
@@ -62,30 +62,30 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, An
         ducky = ManDuckGenerator().generate(ducky=ducky)
         ducky.image.save(CACHE / f"{dh}.png")
 
-    return {"file": f"/static/{dh}.png"}
+    return DuckResponse(file=f"/static/{dh}.png")
 
 
-@app.get("/details/{type}")
-async def get_details(type: Optional[str] = None) -> dict:
+@app.get("/details/{type}", response_model=Union[ManduckDetails, DuckyDetails])
+async def get_details(type: str) -> Union[ManduckDetails, DuckyDetails]:
     """Get details about accessories which can be used to build ducks/man-ducks."""
     details = {
-        "ducky": {
-            "hats": list(DuckBuilder.hats),
-            "outfits": list(DuckBuilder.outfits),
-            "equipments": list(DuckBuilder.equipments)
-        },
-        "man-duck": {
-            "hats": list(ManDuckGenerator.HATS),
-            "outfits": {
-                variation: list(outfit) for variation, outfit in ManDuckGenerator.OUTFITS.items()
-            },
-            "equipments": {
-                variation: list(equipment) for variation, equipment in ManDuckGenerator.EQUIPMENTS.items()
-            },
-            "variations": list(ManDuckGenerator.VARIATIONS)
-        }
+        "ducky": DuckyDetails(
+            hats=list(DuckBuilder.hats),
+            outfits=list(DuckBuilder.outfits),
+            equipments=list(DuckBuilder.equipments),
+        ),
+        "manduck": ManduckDetails(
+            hats=list(ManDuckGenerator.HATS),
+            outfits=ManduckVariations(
+                variation_1=list(ManDuckGenerator.OUTFITS["variation_1"]),
+                variation_2=list(ManDuckGenerator.OUTFITS["variation_2"]),
+            ),
+            equipments=ManduckVariations(
+                variation_1=list(ManDuckGenerator.EQUIPMENTS["variation_1"]),
+                variation_2=list(ManDuckGenerator.EQUIPMENTS["variation_2"]),
+            ),
+            variations=list(ManDuckGenerator.VARIATIONS),
+        )
     }
 
-    if type:
-        return details.get(type, {"message": "Requested type is not available"})
-    return details
+    return details.get(type, Response("Requested type is not available", 400))

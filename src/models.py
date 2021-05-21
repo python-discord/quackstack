@@ -50,3 +50,33 @@ class ManDuckRequest(BaseModel):
     colors: Colors
     dress_colors: DressColors
     accessories: Accessories
+
+
+class DuckResponse(BaseModel):
+    """The generated ducky file location."""
+
+    file: str
+
+
+class DuckyDetails(BaseModel):
+    """Details of available ducky creation assets."""
+
+    hats: list[str]
+    outfits: list[str]
+    equipments: list[str]
+
+
+class ManduckVariations(BaseModel):
+    """Details of available manduck variations."""
+
+    variation_1: list[str]
+    variation_2: list[str]
+
+
+class ManduckDetails(BaseModel):
+    """Details of available manduck creation assets."""
+
+    hats: list[str]
+    outfits: ManduckVariations
+    equipments: ManduckVariations
+    variations: list[int]
