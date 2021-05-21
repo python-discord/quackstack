@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
 from src.manducky import ManDuckGenerator
-from src.models import DuckRequest, ManDuckRequest, DuckResponse, DuckyDetails, ManduckDetails, ManduckVariations
+from src.models import DuckRequest, DuckResponse, DuckyDetails, ManDuckRequest, ManduckDetails, ManduckVariations
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
@@ -68,7 +68,6 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse
 @app.get("/details/{type}", response_model=Union[ManduckDetails, DuckyDetails])
 async def get_details(type: str = None) -> Union[ManduckDetails, DuckyDetails]:
     """Get details about accessories which can be used to build ducks/man-ducks."""
-
     details = {
         "ducky": DuckyDetails(
             hats=list(DuckBuilder.hats),
