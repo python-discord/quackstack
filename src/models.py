@@ -50,3 +50,7 @@ class ManDuckRequest(BaseModel):
     colors: Colors
     dress_colors: DressColors
     accessories: Accessories
+
+
+class DuckResponse(BaseModel):
+    file: str

@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
 from src.manducky import ManDuckGenerator
-from src.models import DuckRequest, ManDuckRequest
+from src.models import DuckRequest, ManDuckRequest, DuckResponse
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
@@ -26,8 +26,8 @@ def dicthash(data: dict) -> str:
     return sha1(dumps(data).encode()).hexdigest()
 
 
-@app.get("/duck")
-async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
+@app.get("/duck", response_model=DuckResponse)
+async def get_duck(duck: Optional[DuckRequest] = None) -> DuckResponse:
     """Create a new duck."""
     if duck:
         dh = dicthash(duck.dict())
@@ -41,11 +41,11 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> Dict[str, Any]:
 
         DuckBuilder().generate().image.save(file)
 
-    return {"file": f"/static/{dh}.png"}
+    return DuckResponse(file=f"/static/{dh}.png")
 
 
-@app.get("/manduck")
-async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, Any]:
+@app.get("/manduck", response_model=DuckResponse)
+async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse:
     """Create a new man_duck."""
     if manduck:
         dh = dicthash(manduck.dict())
@@ -62,7 +62,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> Dict[str, An
         ducky = ManDuckGenerator().generate(ducky=ducky)
         ducky.image.save(CACHE / f"{dh}.png")
 
-    return {"file": f"/static/{dh}.png"}
+    return DuckResponse(file=f"/static/{dh}.png")
 
 
 @app.get("/details/{type}")
