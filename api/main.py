@@ -5,12 +5,12 @@ from pathlib import Path
 from time import time
 from typing import Optional, Union
 
+from api.models import DuckRequest, DuckResponse, DuckyDetails, ManDuckRequest, ManduckDetails, ManduckVariations
 from fastapi import FastAPI, Response
+from fastapi.exceptions import HTTPException
 from fastapi.staticfiles import StaticFiles
+from quackstack import DuckBuilder, ManDuckBuilder
 
-from src.ducky import DuckBuilder
-from src.manducky import ManDuckGenerator
-from src.models import DuckRequest, DuckResponse, DuckyDetails, ManDuckRequest, ManduckDetails, ManduckVariations
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
@@ -34,7 +34,12 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> DuckResponse:
         file = CACHE / f"{dh}.png"
 
         if not file.exists():
-            DuckBuilder().generate(options=duck).image.save(file)
+            try:
+                DuckBuilder().generate(options=duck.dict()).image.save(file)
+            except ValueError as e:
+                raise HTTPException(400, e.args[0])
+            except KeyError as e:
+                raise HTTPException(400, f"Invalid configuration option provided: '{e.args[0]}'")
     else:
         dh = sha1(str(time()).encode()).hexdigest()
         file = CACHE / f"{dh}.png"
@@ -52,14 +57,19 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse
         file = CACHE / f"{dh}.png"
 
         if not file.exists():
-            ducky = ManDuckGenerator().generate(options=manduck)
+            try:
+                ducky = ManDuckBuilder().generate(options=manduck.dict())
+            except ValueError as e:
+                raise HTTPException(400, e.args[0])
+            except KeyError as e:
+                raise HTTPException(400, f"Invalid configuration option provided: '{e.args[0]}'")
             ducky.image.save(CACHE / f"{dh}.png")
 
     else:
         dh = sha1(str(time()).encode()).hexdigest()
 
         ducky = DuckBuilder().generate()
-        ducky = ManDuckGenerator().generate(ducky=ducky)
+        ducky = ManDuckBuilder().generate(ducky=ducky)
         ducky.image.save(CACHE / f"{dh}.png")
 
     return DuckResponse(file=f"/static/{dh}.png")
@@ -75,16 +85,16 @@ async def get_details(type: str) -> Union[ManduckDetails, DuckyDetails]:
             equipments=list(DuckBuilder.equipments),
         ),
         "manduck": ManduckDetails(
-            hats=list(ManDuckGenerator.HATS),
+            hats=list(ManDuckBuilder.HATS),
             outfits=ManduckVariations(
-                variation_1=list(ManDuckGenerator.OUTFITS["variation_1"]),
-                variation_2=list(ManDuckGenerator.OUTFITS["variation_2"]),
+                variation_1=list(ManDuckBuilder.OUTFITS["variation_1"]),
+                variation_2=list(ManDuckBuilder.OUTFITS["variation_2"]),
             ),
             equipments=ManduckVariations(
-                variation_1=list(ManDuckGenerator.EQUIPMENTS["variation_1"]),
-                variation_2=list(ManDuckGenerator.EQUIPMENTS["variation_2"]),
+                variation_1=list(ManDuckBuilder.EQUIPMENTS["variation_1"]),
+                variation_2=list(ManDuckBuilder.EQUIPMENTS["variation_2"]),
             ),
-            variations=list(ManDuckGenerator.VARIATIONS),
+            variations=list(ManDuckBuilder.VARIATIONS),
         )
     }
 

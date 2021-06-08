@@ -5,20 +5,19 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
-from fastapi import HTTPException
+from quackstack import __file__ as qs_file
 
 from .colors import DressColors, DuckyColors, make_man_duck_colors
 from .ducky import ProceduralDucky
-from .models import ManDuckRequest
 
 ManDucky = namedtuple("ManDucky", "image")
 Color = Tuple[int, int, int]
 
-ASSETS_PATH = Path("duck-builder", "duck-person")
+ASSETS_PATH = Path(qs_file).parent / Path("assets", "manduck")
 MAN_DUCKY_SIZE = (600, 1194)
 
 
-class ManDuckGenerator:
+class ManDuckBuilder:
     """Temporary class used to generate a ducky human."""
 
     VARIATIONS = (1, 2)
@@ -76,11 +75,11 @@ class ManDuckGenerator:
                 dress_colors.shirt
             )
         else:
-            template['shirt'] = (
+            template["shirt"] = (
                 ASSETS_PATH / "templates/variation_2/shirt.png",
                 dress_colors.shirt
             )
-            template['pants'] = (
+            template["pants"] = (
                 ASSETS_PATH / "templates/variation_2/pants.png",
                 dress_colors.pants
             )
@@ -101,18 +100,18 @@ class ManDuckGenerator:
         return self.generate_tempalte(
             ducky=ProceduralDucky(None, colors, **accessories),
             dress_colors=DressColors(**options["dress_colors"]),
-            variation_=options['variation']
+            variation_=options["variation"]
         )
 
     def generate(
         self,
         *,
-            options: Optional[ManDuckRequest] = None,
+            options: Optional[dict] = None,
             ducky: Optional[ProceduralDucky] = None
     ) -> ManDucky:
         """Actually generate the man ducky from the provided request, else generate a random one.."""
         if options:
-            template = self.generate_from_options(options.dict())
+            template = self.generate_from_options(options)
         else:
             template = self.generate_tempalte(
                 ducky, make_man_duck_colors(ducky.colors.body), random.choice(self.VARIATIONS)
@@ -128,10 +127,7 @@ class ManDuckGenerator:
         try:
             layer = Image.open(layer_path)
         except FileNotFoundError:
-            raise HTTPException(
-                400,
-                f"Invalid option provided: {os.path.basename(layer_path)} not found."
-            )
+            raise ValueError(f"Invalid option provided: {os.path.basename(layer_path)} not found.")
 
         if recolor:
             if isinstance(recolor, dict):

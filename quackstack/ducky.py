@@ -5,12 +5,11 @@ from random import choice
 from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
-from fastapi import HTTPException
+from quackstack import __file__ as qs_file
 
 from .colors import DuckyColors, make_duck_colors
-from .models import DuckRequest
 
-ASSETS_PATH = Path("duck-builder", "ducky")
+ASSETS_PATH = Path(qs_file).parent / Path("assets", "ducky")
 DUCK_SIZE = (499, 600)
 
 ProceduralDucky = namedtuple("ProceduralDucky", "image colors hat equipment outfit")
@@ -63,10 +62,10 @@ class DuckBuilder:
             **options["accessories"]
         )
 
-    def generate(self, *, options: Optional[DuckRequest] = None) -> ProceduralDucky:
+    def generate(self, *, options: Optional[dict] = None) -> ProceduralDucky:
         """Actually generate the ducky from the provided request, else generate a random one."""
         if options:
-            template, colors, hat, outfit, equipment = self.generate_from_options(options.dict())
+            template, colors, hat, outfit, equipment = self.generate_from_options(options)
         else:
             template, colors, hat, outfit, equipment = self.generate_template(
                 make_duck_colors(),
@@ -85,10 +84,7 @@ class DuckBuilder:
         try:
             layer = Image.open(layer_path)
         except FileNotFoundError:
-            raise HTTPException(
-                400,
-                f"Invalid option provided: {os.path.basename(layer_path)} not found."
-            )
+            raise ValueError(f"Invalid option provided: {os.path.basename(layer_path)} not found.")
 
         if recolor:
             if isinstance(recolor, dict):
