@@ -6,6 +6,7 @@ from time import time
 from typing import Optional, Union
 
 from fastapi import FastAPI, Response
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.ducky import DuckBuilder
@@ -17,6 +18,13 @@ CACHE = Path(getenv("LOCATION", "./static"))
 CACHE.mkdir(exist_ok=True)
 
 app = FastAPI(docs_url="/swagger_docs", redoc_url="/docs")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.mount("/static", StaticFiles(directory=CACHE), name="static")
 
