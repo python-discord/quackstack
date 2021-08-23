@@ -106,8 +106,8 @@ class ManDuckBuilder:
     def generate(
         self,
         *,
-            options: Optional[dict] = None,
-            ducky: Optional[ProceduralDucky] = None
+        options: Optional[dict] = None,
+        ducky: Optional[ProceduralDucky] = None
     ) -> ManDucky:
         """Actually generate the man ducky from the provided request, else generate a random one.."""
         if options:
