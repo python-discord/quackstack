@@ -35,7 +35,7 @@ def dicthash(data: dict) -> str:
 
 
 @app.get("/duck", response_model=DuckResponse)
-async def get_duck(duck: Optional[DuckRequest] = None) -> DuckResponse:
+async def get_duck(duck: Optional[DuckRequest] = None, seed: int = None) -> DuckResponse:
     """Create a new duck."""
     if duck:
         dh = dicthash(duck.dict())
@@ -43,7 +43,7 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> DuckResponse:
 
         if not file.exists():
             try:
-                DuckBuilder().generate(options=duck.dict()).image.save(file)
+                DuckBuilder(seed).generate(options=duck.dict()).image.save(file)
             except ValueError as e:
                 raise HTTPException(400, e.args[0])
             except KeyError as e:
@@ -58,7 +58,7 @@ async def get_duck(duck: Optional[DuckRequest] = None) -> DuckResponse:
 
 
 @app.get("/manduck", response_model=DuckResponse)
-async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse:
+async def get_man_duck(manduck: Optional[ManDuckRequest] = None, seed: int = None) -> DuckResponse:
     """Create a new man_duck."""
     if manduck:
         dh = dicthash(manduck.dict())
@@ -66,7 +66,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None) -> DuckResponse
 
         if not file.exists():
             try:
-                ducky = ManDuckBuilder().generate(options=manduck.dict())
+                ducky = ManDuckBuilder(seed).generate(options=manduck.dict())
             except ValueError as e:
                 raise HTTPException(400, e.args[0])
             except KeyError as e:
