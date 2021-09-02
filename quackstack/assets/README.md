@@ -1,4 +1,4 @@
-# Ducky Builder!
+# Assets!
 This directory contains all the assets you need to build a ducky or a man-ducky!
 
 
