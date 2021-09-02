@@ -31,8 +31,8 @@ class DuckBuilder:
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
     }
 
-    def __init__(self, seed: int = None):
-        self.random = Random(seed) if seed else Random()
+    def __init__(self, seed: Optional[int] = None):
+        self.random = Random(seed)
         self.output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
 
     def generate_template(

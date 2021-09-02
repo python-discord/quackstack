@@ -35,7 +35,7 @@ def dicthash(data: dict) -> str:
 
 
 @app.get("/duck", response_model=DuckResponse)
-async def get_duck(duck: Optional[DuckRequest] = None, seed: int = None) -> DuckResponse:
+async def get_duck(duck: Optional[DuckRequest] = None, seed: Optional[int] = None) -> DuckResponse:
     """Create a new duck."""
     if duck:
         dh = dicthash(duck.dict())
@@ -58,7 +58,7 @@ async def get_duck(duck: Optional[DuckRequest] = None, seed: int = None) -> Duck
 
 
 @app.get("/manduck", response_model=DuckResponse)
-async def get_man_duck(manduck: Optional[ManDuckRequest] = None, seed: int = None) -> DuckResponse:
+async def get_man_duck(manduck: Optional[ManDuckRequest] = None, seed: Optional[int] = None) -> DuckResponse:
     """Create a new man_duck."""
     if manduck:
         dh = dicthash(manduck.dict())

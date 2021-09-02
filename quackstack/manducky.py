@@ -41,8 +41,8 @@ class ManDuckBuilder:
         }
     }
 
-    def __init__(self, seed: int = None):
-        self.random = Random(seed) if seed else Random()
+    def __init__(self, seed: Optional[int] = None):
+        self.random = Random(seed)
         self.output: Image.Image = Image.new("RGBA", MAN_DUCKY_SIZE, color=(0, 0, 0, 0))
 
     def generate_tempalte(
