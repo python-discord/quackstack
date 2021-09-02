@@ -1,7 +1,7 @@
 import os
 from collections import namedtuple
 from pathlib import Path
-from random import choice
+from random import Random
 from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
@@ -31,7 +31,8 @@ class DuckBuilder:
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
     }
 
-    def __init__(self):
+    def __init__(self, seed: int = None):
+        self.random = Random(seed) if seed else Random()
         self.output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
 
     def generate_template(
@@ -69,9 +70,9 @@ class DuckBuilder:
         else:
             template, colors, hat, outfit, equipment = self.generate_template(
                 make_duck_colors(),
-                choice([*list(self.hats), None]),
-                choice([*list(self.outfits), None]),
-                choice([*list(self.equipments), None])
+                self.random.choice([*list(self.hats), None]),
+                self.random.choice([*list(self.outfits), None]),
+                self.random.choice([*list(self.equipments), None])
             )
 
         for item in template.values():
