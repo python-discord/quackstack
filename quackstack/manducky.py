@@ -1,7 +1,7 @@
 import os
-import random
 from collections import namedtuple
 from pathlib import Path
+from random import Random
 from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
@@ -41,7 +41,8 @@ class ManDuckBuilder:
         }
     }
 
-    def __init__(self):
+    def __init__(self, seed: Optional[int] = None):
+        self.random = Random(seed)
         self.output: Image.Image = Image.new("RGBA", MAN_DUCKY_SIZE, color=(0, 0, 0, 0))
 
     def generate_tempalte(
@@ -114,7 +115,7 @@ class ManDuckBuilder:
             template = self.generate_from_options(options)
         else:
             template = self.generate_tempalte(
-                ducky, make_man_duck_colors(ducky.colors.body), random.choice(self.VARIATIONS)
+                ducky, make_man_duck_colors(ducky.colors.body), self.random.choice(self.VARIATIONS)
             )
 
         for item in template.values():
