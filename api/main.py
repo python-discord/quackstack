@@ -43,7 +43,7 @@ async def get_duck(duck: Optional[DuckRequest] = None, seed: Optional[int] = Non
 
         if not file.exists():
             try:
-                DuckBuilder(seed).generate(options=duck.dict()).image.save(file)
+                DuckBuilder().generate(options=duck.dict()).image.save(file)
             except ValueError as e:
                 raise HTTPException(400, e.args[0])
             except KeyError as e:
@@ -52,7 +52,7 @@ async def get_duck(duck: Optional[DuckRequest] = None, seed: Optional[int] = Non
         dh = sha1(str(time()).encode()).hexdigest()
         file = CACHE / f"{dh}.png"
 
-        DuckBuilder().generate().image.save(file)
+        DuckBuilder(seed).generate().image.save(file)
 
     return DuckResponse(file=f"/static/{dh}.png")
 
@@ -66,7 +66,7 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None, seed: Optional[
 
         if not file.exists():
             try:
-                ducky = ManDuckBuilder(seed).generate(options=manduck.dict())
+                ducky = ManDuckBuilder().generate(options=manduck.dict())
             except ValueError as e:
                 raise HTTPException(400, e.args[0])
             except KeyError as e:
@@ -76,8 +76,8 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None, seed: Optional[
     else:
         dh = sha1(str(time()).encode()).hexdigest()
 
-        ducky = DuckBuilder().generate()
-        ducky = ManDuckBuilder().generate(ducky=ducky)
+        ducky = DuckBuilder(seed).generate()
+        ducky = ManDuckBuilder(seed).generate(ducky=ducky)
         ducky.image.save(CACHE / f"{dh}.png")
 
     return DuckResponse(file=f"/static/{dh}.png")
