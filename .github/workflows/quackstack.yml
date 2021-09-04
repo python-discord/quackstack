@@ -156,6 +156,6 @@ jobs:
         uses: Azure/k8s-deploy@v1
         with:
           manifests: |
-              quackstack/deployment.yaml
+              namespaces/default/quackstack/deployment.yaml
           images: 'ghcr.io/python-discord/quackstack:${{ steps.sha_tag.outputs.tag }}'
           kubectl-version: 'latest'
