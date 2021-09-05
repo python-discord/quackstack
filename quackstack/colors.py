@@ -7,7 +7,7 @@ DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
 DressColors = namedtuple("DressColors", "shirt pants")
 
 
-def make_color(hue: float, dark_variant: bool) -> Tuple[float, float, float]:
+def make_color(random: Random, hue: float, dark_variant: bool) -> Tuple[float, float, float]:
     """Make a nice hls color to use in a duck."""
     saturation = 1
     lightness = random.uniform(.7, .85)
@@ -28,7 +28,7 @@ def make_duck_colors(random: Random) -> DuckyColors:
     """Create a matching DuckyColors object."""
     hue = random.random()
     dark_variant = random.choice([True, False])
-    eye, wing, body, beak = (make_color(hue, dark_variant) for _ in range(4))
+    eye, wing, body, beak = (make_color(random, hue, dark_variant) for _ in range(4))
 
     # Lower the eye light
     eye_main = (eye[0], max(.1, eye[1] - .7), eye[2])
