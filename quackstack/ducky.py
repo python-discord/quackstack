@@ -40,10 +40,10 @@ class DuckBuilder:
     ) -> Tuple[dict, DuckyColors, str, str, str]:
         """Generate a duck structure from given configuration."""
         template = {
+            "beak": (self.templates[5], colors.beak),
             "body": (self.templates[4], colors.body),
             "wing": (self.templates[3], colors.wing),
             "eye": (self.templates[1], colors.eye),
-            "beak": (self.templates[5], colors.beak),
             "eye_wing": (self.templates[2], colors.eye_wing),
         }
 
@@ -69,7 +69,7 @@ class DuckBuilder:
             template, colors, hat, outfit, equipment = self.generate_from_options(options)
         else:
             template, colors, hat, outfit, equipment = self.generate_template(
-                make_duck_colors(),
+                make_duck_colors(self.random),
                 self.random.choice([*list(self.hats), None]),
                 self.random.choice([*list(self.outfits), None]),
                 self.random.choice([*list(self.equipments), None])
