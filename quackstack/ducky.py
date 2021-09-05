@@ -69,7 +69,7 @@ class DuckBuilder:
             template, colors, hat, outfit, equipment = self.generate_from_options(options)
         else:
             template, colors, hat, outfit, equipment = self.generate_template(
-                make_duck_colors(),
+                make_duck_colors(self.random),
                 self.random.choice([*list(self.hats), None]),
                 self.random.choice([*list(self.outfits), None]),
                 self.random.choice([*list(self.equipments), None])

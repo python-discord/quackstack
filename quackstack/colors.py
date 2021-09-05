@@ -1,6 +1,6 @@
-import random
 from collections import namedtuple
 from colorsys import hls_to_rgb, rgb_to_hls
+from random import Random
 from typing import Tuple
 
 DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
@@ -24,7 +24,7 @@ def make_color(hue: float, dark_variant: bool) -> Tuple[float, float, float]:
     return hue, lightness, saturation
 
 
-def make_duck_colors() -> DuckyColors:
+def make_duck_colors(random: Random) -> DuckyColors:
     """Create a matching DuckyColors object."""
     hue = random.random()
     dark_variant = random.choice([True, False])
