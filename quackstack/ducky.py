@@ -75,8 +75,9 @@ class DuckBuilder:
                 self.random.choice([*list(self.equipments), None])
             )
 
-        for item in template.values():
-            self.apply_layer(*item)
+        for key in ["beak", "body", "eye", "equipment", "wing", "eye_wing", "hat", "outfit"]:
+            if item := template.get(key):
+                self.apply_layer(*item)
 
         return ProceduralDucky(self.output, colors, hat, equipment, outfit)
 
