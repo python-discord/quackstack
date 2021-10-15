@@ -46,8 +46,8 @@ class ManDuckBuilder:
         self.random = Random(seed)
         self.output: Image.Image = Image.new("RGBA", MAN_DUCKY_SIZE, color=(0, 0, 0, 0))
 
-    def generate_tempalte(
-            self, ducky: ProceduralDucky, dress_colors: DressColors, variation_: int
+    def generate_template(
+        self, ducky: ProceduralDucky, dress_colors: DressColors, variation_: int
     ) -> dict:
         """Generate a man duck structure from given configuration."""
         variation = f"variation_{variation_}"
@@ -99,7 +99,7 @@ class ManDuckBuilder:
         colors = DuckyColors(**options["colors"])
         accessories = options["accessories"]
 
-        return self.generate_tempalte(
+        return self.generate_template(
             ducky=ProceduralDucky(None, colors, **accessories),
             dress_colors=DressColors(**options["dress_colors"]),
             variation_=options["variation"]
@@ -115,7 +115,7 @@ class ManDuckBuilder:
         if options:
             template = self.generate_from_options(options)
         else:
-            template = self.generate_tempalte(
+            template = self.generate_template(
                 ducky, make_man_duck_colors(ducky.colors.body), self.random.choice(self.VARIATIONS)
             )
 
