@@ -14,9 +14,9 @@ from api.models import (
     DuckRequest,
     DuckResponse,
     DuckyDetails,
-    ManduckDetails,
+    ManDuckDetails,
     ManDuckRequest,
-    ManduckVariations,
+    ManDuckVariations,
 )
 from quackstack import DuckBuilder, ManDuckBuilder
 
@@ -90,8 +90,8 @@ async def get_man_duck(manduck: Optional[ManDuckRequest] = None, seed: Optional[
     return DuckResponse(file=f"/static/{dh}.png")
 
 
-@app.get("/details/{type}", response_model=Union[ManduckDetails, DuckyDetails])
-async def get_details(type: str) -> Union[ManduckDetails, DuckyDetails]:
+@app.get("/details/{type}", response_model=Union[ManDuckDetails, DuckyDetails])
+async def get_details(type: str) -> Union[ManDuckDetails, DuckyDetails]:
     """Get details about accessories which can be used to build ducks/man-ducks."""
     details = {
         "ducky": DuckyDetails(
@@ -99,13 +99,13 @@ async def get_details(type: str) -> Union[ManduckDetails, DuckyDetails]:
             outfits=list(DuckBuilder.outfits),
             equipments=list(DuckBuilder.equipments),
         ),
-        "manduck": ManduckDetails(
+        "manduck": ManDuckDetails(
             hats=list(ManDuckBuilder.HATS),
-            outfits=ManduckVariations(
+            outfits=ManDuckVariations(
                 variation_1=list(ManDuckBuilder.OUTFITS["variation_1"]),
                 variation_2=list(ManDuckBuilder.OUTFITS["variation_2"]),
             ),
-            equipments=ManduckVariations(
+            equipments=ManDuckVariations(
                 variation_1=list(ManDuckBuilder.EQUIPMENTS["variation_1"]),
                 variation_2=list(ManDuckBuilder.EQUIPMENTS["variation_2"]),
             ),

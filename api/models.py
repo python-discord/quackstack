@@ -66,17 +66,17 @@ class DuckyDetails(BaseModel):
     equipments: list[str]
 
 
-class ManduckVariations(BaseModel):
+class ManDuckVariations(BaseModel):
     """Details of available manduck variations."""
 
     variation_1: list[str]
     variation_2: list[str]
 
 
-class ManduckDetails(BaseModel):
+class ManDuckDetails(BaseModel):
     """Details of available manduck creation assets."""
 
     hats: list[str]
-    outfits: ManduckVariations
-    equipments: ManduckVariations
+    outfits: ManDuckVariations
+    equipments: ManDuckVariations
     variations: list[int]
