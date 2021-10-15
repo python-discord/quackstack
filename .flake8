@@ -1,7 +1,6 @@
 [flake8]
 max-line-length=120
 docstring-convention=all
-import-order-style=pycharm
 application_import_names=src
 exclude=.cache,.venv,.git
 ignore=

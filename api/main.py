@@ -10,14 +10,7 @@ from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from api.models import (
-    DuckRequest,
-    DuckResponse,
-    DuckyDetails,
-    ManDuckDetails,
-    ManDuckRequest,
-    ManDuckVariations,
-)
+from api.models import DuckRequest, DuckResponse, DuckyDetails, ManDuckDetails, ManDuckRequest, ManDuckVariations
 from quackstack import DuckBuilder, ManDuckBuilder
 
 CACHE = Path(getenv("LOCATION", "./static"))
