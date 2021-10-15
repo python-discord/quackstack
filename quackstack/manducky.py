@@ -5,6 +5,7 @@ from random import Random
 from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
+
 from quackstack import __file__ as qs_file
 
 from .colors import DressColors, DuckyColors, make_man_duck_colors

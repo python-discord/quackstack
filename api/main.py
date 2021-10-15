@@ -5,13 +5,20 @@ from pathlib import Path
 from time import time
 from typing import Optional, Union
 
-from api.models import DuckRequest, DuckResponse, DuckyDetails, ManDuckRequest, ManduckDetails, ManduckVariations
 from fastapi import FastAPI, Response
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from quackstack import DuckBuilder, ManDuckBuilder
 
+from api.models import (
+    DuckRequest,
+    DuckResponse,
+    DuckyDetails,
+    ManduckDetails,
+    ManDuckRequest,
+    ManduckVariations,
+)
+from quackstack import DuckBuilder, ManDuckBuilder
 
 CACHE = Path(getenv("LOCATION", "./static"))
 
