@@ -1,29 +1,29 @@
 [tool.poetry]
 name = "quackstack"
-version = "1.0.0"
+version = "1.1.0"
 description = "An on-demand procedural ducky delivery service."
-authors = ["vcokltfre <vcokltfre@gmail.com>"]
+authors = ["vcokltfre <vcokltfre@gmail.com>", "ChrisLovering <chris.lovering.95@gmail.com"]
 license = "MIT"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-fastapi = "^0.65.2"
-Pillow = "^8.1.2"
-aiofiles = "^0.6.0"
-uvicorn = "^0.13.4"
+python = "3.10.*"
+fastapi = "0.85.0"
+Pillow = "9.2.0"
+aiofiles = "22.1.0"
+uvicorn = "0.18.3"
 
 [tool.poetry.dev-dependencies]
-flake8 = "^3.8"
-flake8-annotations = "^2.3"
-flake8-bugbear = "^21.4.3"
-flake8-docstrings = "^1.5"
-flake8-string-format = "^0.3"
-flake8-tidy-imports = "^4.1"
-flake8-todo = "^0.7"
-pep8-naming = "^0.11"
-pre-commit = "^2.1"
-taskipy = "^1.6.0"
-flake8-isort = "^4.1.1"
+flake8 = "5.0.4"
+flake8-annotations = "2.9.1"
+flake8-bugbear = "22.9.23"
+flake8-docstrings = "1.6.0"
+flake8-string-format = "0.3.0"
+flake8-tidy-imports = "4.8.0"
+flake8-todo = "0.7"
+pep8-naming = "0.13.2"
+pre-commit = "2.20.0"
+taskipy = "1.10.3"
+flake8-isort = "4.2.0"
 
 [tool.taskipy.tasks]
 lint = "pre-commit run --all-files"
