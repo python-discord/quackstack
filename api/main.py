@@ -5,7 +5,7 @@ from pathlib import Path
 from time import time
 from typing import Optional, Union
 
-from fastapi import FastAPI, Response, Request
+from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
