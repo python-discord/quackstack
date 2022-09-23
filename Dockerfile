@@ -1,13 +1,10 @@
-FROM --platform=linux/amd64 python:3.9-slim-buster
+FROM --platform=linux/amd64 ghcr.io/chrislovering/python-poetry-base:3.10-slim
 
 WORKDIR /app
+COPY pyproject.toml poetry.lock ./
+RUN poetry install --without dev
 
-RUN pip install poetry
+COPY . .
 
-COPY pyproject.toml /app/pyproject.toml
-
-RUN poetry install --no-dev
-
-COPY . /app
-
-CMD ["poetry", "run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "80"]
+ENTRYPOINT ["poetry"]
+CMD ["run", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "80"]

@@ -139,6 +139,7 @@ cython_debug/
 
 # Our generated duckies
 static/
+ducks/
 
 # VSCode
 .vscode/
