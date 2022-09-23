@@ -16,8 +16,8 @@ Note: to run the server for development you can use `poetry run task start-dev` 
 
 #### Linux
 
-`sudo docker-compose up`
+`sudo docker compose up`
 
 #### Windows
 
-`docker-compose up`
+`docker compose up`
