@@ -12,6 +12,7 @@ fastapi = "0.103.1"
 Pillow = "10.0.0"
 aiofiles = "23.2.1"
 uvicorn = "0.23.2"
+frozendict = "2.3.8"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "3.4.0"
