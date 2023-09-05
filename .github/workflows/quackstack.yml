@@ -13,13 +13,11 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install Python Dependencies
-        uses: HassanAbouelela/actions/setup-python@setup-python_v1.3.1
+        uses: HassanAbouelela/actions/setup-python@setup-python_v1.4.1
         with:
-          # Set dev=true to install flake8 extensions, which are dev dependencies
-          dev: true
           python_version: '3.10'
 
       # We will not run `flake8` here, as we will use a separate flake8
@@ -43,10 +41,8 @@ jobs:
   build:
     name: Build & Push Docker image
     runs-on: ubuntu-latest
-
     needs: [lint]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
     steps:
       - name: Create SHA Container Tag
         id: sha_tag
@@ -54,20 +50,20 @@ jobs:
           tag=$(cut -c 1-7 <<< $GITHUB_SHA)
           echo "::set-output name=tag::$tag"
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to Github Container Registry
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN  }}
 
       - name: Build and push
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: ./Dockerfile
@@ -81,9 +77,7 @@ jobs:
   deploy:
     name: Deploy to Kubernetes
     runs-on: ubuntu-latest
-
     needs: [build]
-
     steps:
       - name: Create SHA Container Tag
         id: sha_tag
@@ -95,20 +89,22 @@ jobs:
       # deployment.yaml file using a GitHub Personal Access
       # Token to get access.
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
-          repository: python-discord/kubernetes
+          repository: python-discord/infra
+          path: infra
+
+      - uses: azure/setup-kubectl@v3
 
       - name: Authenticate with Kubernetes
-        uses: azure/k8s-set-context@v1
+        uses: azure/k8s-set-context@v3
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
 
       - name: Deploy to Kubernetes
-        uses: Azure/k8s-deploy@v1
+        uses: azure/k8s-deploy@v4
         with:
           manifests: |
-              namespaces/default/quackstack/deployment.yaml
+            infra/kubernetes/namespaces/default/quackstack/deployment.yaml
           images: 'ghcr.io/python-discord/quackstack:${{ steps.sha_tag.outputs.tag }}'
-          kubectl-version: 'latest'
