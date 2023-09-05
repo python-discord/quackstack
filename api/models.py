@@ -1,4 +1,3 @@
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -25,15 +24,15 @@ class DressColors(BaseModel):
     """Valid options for a man ducky dress colors."""
 
     shirt: PartOption
-    pants: Optional[PartOption]
+    pants: PartOption | None
 
 
 class Accessories(BaseModel):
     """Valid accessories for a duck."""
 
-    hat: Optional[str]
-    outfit: Optional[str]
-    equipment: Optional[str]
+    hat: str | None
+    outfit: str | None
+    equipment: str | None
 
 
 class DuckRequest(BaseModel):

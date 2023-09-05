@@ -2,7 +2,6 @@ import os
 from collections import namedtuple
 from pathlib import Path
 from random import Random
-from typing import Optional, Tuple
 
 from PIL import Image, ImageChops
 
@@ -32,13 +31,13 @@ class DuckBuilder:
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
     }
 
-    def __init__(self, seed: Optional[int] = None):
+    def __init__(self, seed: int | None = None) -> None:
         self.random = Random(seed)
         self.output: Image.Image = Image.new("RGBA", DUCK_SIZE, color=(0, 0, 0, 0))
 
     def generate_template(
-            self, colors: DuckyColors, hat: str, outfit: str, equipment: str
-    ) -> Tuple[dict, DuckyColors, str, str, str]:
+            self, colors: DuckyColors, hat: str, outfit: str, equipment: str,
+    ) -> tuple[dict, DuckyColors, str, str, str]:
         """Generate a duck structure from given configuration."""
         template = {
             "beak": (self.templates[5], colors.beak),
@@ -57,14 +56,14 @@ class DuckBuilder:
 
         return template, colors, hat, outfit, equipment
 
-    def generate_from_options(self, options: dict) -> Tuple[dict, DuckyColors, str, str, str]:
+    def generate_from_options(self, options: dict) -> tuple[dict, DuckyColors, str, str, str]:
         """Generate a duck from the provided request."""
         return self.generate_template(
             colors=DuckyColors(**options["colors"]),
-            **options["accessories"]
+            **options["accessories"],
         )
 
-    def generate(self, *, options: Optional[dict] = None) -> ProceduralDucky:
+    def generate(self, *, options: dict | None = None) -> ProceduralDucky:
         """Actually generate the ducky from the provided request, else generate a random one."""
         if options:
             template, colors, hat, outfit, equipment = self.generate_from_options(options)
@@ -73,7 +72,7 @@ class DuckBuilder:
                 make_duck_colors(self.random),
                 self.random.choice([*list(self.hats), None]),
                 self.random.choice([*list(self.outfits), None]),
-                self.random.choice([*list(self.equipments), None])
+                self.random.choice([*list(self.equipments), None]),
             )
 
         for key in ["beak", "body", "eye", "equipment", "wing", "eye_wing", "hat", "outfit"]:
@@ -82,7 +81,7 @@ class DuckBuilder:
 
         return ProceduralDucky(self.output, colors, hat, equipment, outfit)
 
-    def apply_layer(self, layer_path: str, recolor: Optional[Tuple[int, int, int]] = None) -> None:
+    def apply_layer(self, layer_path: str, recolor: tuple[int, int, int] | None = None) -> None:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
         try:
             layer = Image.open(layer_path)

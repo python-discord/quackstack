@@ -1,13 +1,12 @@
 from collections import namedtuple
 from colorsys import hls_to_rgb, rgb_to_hls
 from random import Random
-from typing import Tuple
 
 DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
 DressColors = namedtuple("DressColors", "shirt pants")
 
 
-def make_color(random: Random, hue: float, dark_variant: bool) -> Tuple[float, float, float]:
+def make_color(random: Random, hue: float, dark_variant: bool) -> tuple[float, float, float]:
     """Make a nice hls color to use in a duck."""
     saturation = 1
     lightness = random.uniform(.7, .85)
@@ -53,10 +52,10 @@ def make_man_duck_colors(ducky: tuple) -> DressColors:
     second_varient = [((hls_[0] * 360 + 240) % 360) / 360, hls_[1], hls_[2]]
 
     first = tuple(
-        map(lambda x: round(x * 255), hls_to_rgb(first_varient[0], first_varient[1], first_varient[2]))
+        round(x * 255) for x in hls_to_rgb(first_varient[0], first_varient[1], first_varient[2])
     )
     second = tuple(
-        map(lambda x: round(x * 255), hls_to_rgb(second_varient[0], second_varient[1], second_varient[2]))
+        round(x * 255) for x in hls_to_rgb(second_varient[0], second_varient[1], second_varient[2])
     )
 
     return DressColors(first, second)

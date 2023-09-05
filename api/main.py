@@ -3,7 +3,7 @@ from json import dumps
 from os import getenv
 from pathlib import Path
 from time import time
-from typing import Optional, Union
+from typing import Union
 
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import HTTPException
@@ -42,7 +42,7 @@ def make_file_path(dh: str, request_url: URL) -> str:
 
 
 @app.get("/duck", response_model=DuckResponse, status_code=201)
-async def get_duck(request: Request, response: Response, seed: Optional[int] = None) -> DuckResponse:
+async def get_duck(request: Request, response: Response, seed: int | None = None) -> DuckResponse:
     """Create a new random duck, with an optional seed."""
     dh = sha1(str(time()).encode()).hexdigest()
     file = CACHE / f"{dh}.png"
@@ -74,7 +74,7 @@ async def post_duck(request: Request, response: Response, duck: DuckRequest = No
 
 
 @app.get("/manduck", response_model=DuckResponse, status_code=201)
-async def get_man_duck(request: Request, response: Response, seed: Optional[int] = None) -> DuckResponse:
+async def get_man_duck(request: Request, response: Response, seed: int | None = None) -> DuckResponse:
     """Create a new man_duck, with an optional seed."""
     dh = sha1(str(time()).encode()).hexdigest()
 
@@ -108,7 +108,7 @@ async def post_man_duck(request: Request, response: Response, manduck: ManDuckRe
 
 
 @app.get("/details/{type}", response_model=Union[ManDuckDetails, DuckyDetails])
-async def get_details(type: str) -> Union[ManDuckDetails, DuckyDetails]:
+async def get_details(type: str) -> ManDuckDetails | DuckyDetails:
     """Get details about accessories which can be used to build ducks/man-ducks."""
     details = {
         "ducky": DuckyDetails(
@@ -127,7 +127,7 @@ async def get_details(type: str) -> Union[ManDuckDetails, DuckyDetails]:
                 variation_2=list(ManDuckBuilder.EQUIPMENTS["variation_2"]),
             ),
             variations=list(ManDuckBuilder.VARIATIONS),
-        )
+        ),
     }
 
     return details.get(type, Response("Requested type is not available", 400))
