@@ -1,0 +1,23 @@
+name: Lint
+
+on:
+  workflow_call
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python Dependencies
+        uses: HassanAbouelela/actions/setup-python@setup-python_v1.4.1
+        with:
+          python_version: '3.10'
+
+      - name: Run pre-commit hooks
+        run: SKIP=ruff pre-commit run --all-files
+
+        # Run `ruff` using github formatting to enable automatic inline annotations.
+      - name: Run ruff
+        run: "ruff check --format=github ."
