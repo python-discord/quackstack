@@ -1,13 +1,26 @@
-from collections import namedtuple
 from colorsys import hls_to_rgb, rgb_to_hls
 from random import Random
-from typing import Tuple
-
-DuckyColors = namedtuple("DuckyColors", "eye eye_wing wing body beak")
-DressColors = namedtuple("DressColors", "shirt pants")
+from typing import NamedTuple
 
 
-def make_color(random: Random, hue: float, dark_variant: bool) -> Tuple[float, float, float]:
+class DuckyColors(NamedTuple):
+    """RGB tuples of colours for each part of the Ducky."""
+
+    eye: tuple[int, int, int]
+    eye_wing: tuple[int, int, int]
+    wing: tuple[int, int, int]
+    body: tuple[int, int, int]
+    beak: tuple[int, int, int]
+
+
+class DressColors(NamedTuple):
+    """RGB tuples of colours for each part of the Ducky's dress."""
+
+    shirt: tuple[int, int, int]
+    pants: tuple[int, int, int]
+
+
+def make_color(random: Random, hue: float, *, dark_variant: bool) -> tuple[float, float, float]:
     """Make a nice hls color to use in a duck."""
     saturation = 1
     lightness = random.uniform(.7, .85)
@@ -28,7 +41,7 @@ def make_duck_colors(random: Random) -> DuckyColors:
     """Create a matching DuckyColors object."""
     hue = random.random()
     dark_variant = random.choice([True, False])
-    eye, wing, body, beak = (make_color(random, hue, dark_variant) for _ in range(4))
+    eye, wing, body, beak = (make_color(random, hue, dark_variant=dark_variant) for _ in range(4))
 
     # Lower the eye light
     eye_main = (eye[0], max(.1, eye[1] - .7), eye[2])
@@ -47,16 +60,16 @@ def make_man_duck_colors(ducky: tuple) -> DressColors:
     hls_ = tuple(rgb_to_hls(ducky[0] / 255, ducky[1] / 255, ducky[2] / 255))
 
     # Find the first triadic hls color
-    first_varient = [((hls_[0] * 360 + 120) % 360) / 360, hls_[1], hls_[2]]
+    first_variant = [((hls_[0] * 360 + 120) % 360) / 360, hls_[1], hls_[2]]
 
     # Find the second triadic hls color
-    second_varient = [((hls_[0] * 360 + 240) % 360) / 360, hls_[1], hls_[2]]
+    second_variant = [((hls_[0] * 360 + 240) % 360) / 360, hls_[1], hls_[2]]
 
     first = tuple(
-        map(lambda x: round(x * 255), hls_to_rgb(first_varient[0], first_varient[1], first_varient[2]))
+        round(x * 255) for x in hls_to_rgb(first_variant[0], first_variant[1], first_variant[2])
     )
     second = tuple(
-        map(lambda x: round(x * 255), hls_to_rgb(second_varient[0], second_varient[1], second_varient[2]))
+        round(x * 255) for x in hls_to_rgb(second_variant[0], second_variant[1], second_variant[2])
     )
 
     return DressColors(first, second)

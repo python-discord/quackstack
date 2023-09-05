@@ -1,18 +1,23 @@
-import os
-from collections import namedtuple
 from pathlib import Path
 from random import Random
-from typing import Optional, Tuple
+from typing import NamedTuple
 
 from PIL import Image, ImageChops
+from frozendict import frozendict
 
 from quackstack import __file__ as qs_file
 
 from .colors import DressColors, DuckyColors, make_man_duck_colors
 from .ducky import ProceduralDucky
 
-ManDucky = namedtuple("ManDucky", "image")
-Color = Tuple[int, int, int]
+
+class ManDucky(NamedTuple):
+    """Holds a reference to the ManDucky's source image."""
+
+    image: Image.Image
+
+
+Color = tuple[int, int, int]
 
 ASSETS_PATH = Path(qs_file).parent / Path("assets", "manduck")
 MAN_DUCKY_SIZE = (600, 1194)
@@ -22,32 +27,32 @@ class ManDuckBuilder:
     """Temporary class used to generate a ducky human."""
 
     VARIATIONS = (1, 2)
-    HATS = {
+    HATS = frozendict({
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/hats").iterdir()
-    }
-    OUTFITS = {
+    })
+    OUTFITS = frozendict({
         "variation_1": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits/variation_1").iterdir()
         },
         "variation_2": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits/variation_2").iterdir()
-        }
-    }
-    EQUIPMENTS = {
+        },
+    })
+    EQUIPMENTS = frozendict({
         "variation_1": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment/variation_1").iterdir()
         },
         "variation_2": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment/variation_2").iterdir()
-        }
-    }
+        },
+    })
 
-    def __init__(self, seed: Optional[int] = None):
+    def __init__(self, seed: int | None = None) -> None:
         self.random = Random(seed)
         self.output: Image.Image = Image.new("RGBA", MAN_DUCKY_SIZE, color=(0, 0, 0, 0))
 
     def generate_template(
-        self, ducky: ProceduralDucky, dress_colors: DressColors, variation_: int
+        self, ducky: ProceduralDucky, dress_colors: DressColors, variation_: int,
     ) -> dict:
         """Generate a man duck structure from given configuration."""
         variation = f"variation_{variation_}"
@@ -55,35 +60,35 @@ class ManDuckBuilder:
         template = {
             "bill": (
                 ASSETS_PATH / "templates/bill.png",
-                ducky.colors.beak
+                ducky.colors.beak,
             ),
             "head": (
                 ASSETS_PATH / "templates/head.png",
-                ducky.colors.body
+                ducky.colors.body,
             ),
             "eye": (
                 ASSETS_PATH / "templates/eye.png",
-                ducky.colors.eye
+                ducky.colors.eye,
             ),
             "hands": (
                 ASSETS_PATH / f"templates/{variation}/hands.png",
-                ducky.colors.wing
-            )
+                ducky.colors.wing,
+            ),
         }
 
         if variation_ == 1:
             template["dress"] = (
                 ASSETS_PATH / "templates/variation_1/dress.png",
-                dress_colors.shirt
+                dress_colors.shirt,
             )
         else:
             template["shirt"] = (
                 ASSETS_PATH / "templates/variation_2/shirt.png",
-                dress_colors.shirt
+                dress_colors.shirt,
             )
             template["pants"] = (
                 ASSETS_PATH / "templates/variation_2/pants.png",
-                dress_colors.pants
+                dress_colors.pants,
             )
 
         if ducky.hat:
@@ -102,21 +107,21 @@ class ManDuckBuilder:
         return self.generate_template(
             ducky=ProceduralDucky(None, colors, **accessories),
             dress_colors=DressColors(**options["dress_colors"]),
-            variation_=options["variation"]
+            variation_=options["variation"],
         )
 
     def generate(
         self,
         *,
-        options: Optional[dict] = None,
-        ducky: Optional[ProceduralDucky] = None
+        options: dict | None = None,
+        ducky: ProceduralDucky | None = None,
     ) -> ManDucky:
         """Actually generate the man ducky from the provided request, else generate a random one.."""
         if options:
             template = self.generate_from_options(options)
         else:
             template = self.generate_template(
-                ducky, make_man_duck_colors(ducky.colors.body), self.random.choice(self.VARIATIONS)
+                ducky, make_man_duck_colors(ducky.colors.body), self.random.choice(self.VARIATIONS),
             )
 
         for item in template.values():
@@ -124,12 +129,12 @@ class ManDuckBuilder:
 
         return ManDucky(self.output)
 
-    def apply_layer(self, layer_path: str, recolor: Optional[Color] = None) -> None:
+    def apply_layer(self, layer_path: str, recolor: Color | None = None) -> None:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
         try:
             layer = Image.open(layer_path)
-        except FileNotFoundError:
-            raise ValueError(f"Invalid option provided: {os.path.basename(layer_path)} not found.")
+        except FileNotFoundError as e:
+            raise ValueError(f"Invalid option provided: {Path.name(layer_path)} not found.") from e
 
         if recolor:
             if isinstance(recolor, dict):

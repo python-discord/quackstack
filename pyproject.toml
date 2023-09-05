@@ -2,41 +2,46 @@
 name = "quackstack"
 version = "1.1.0"
 description = "An on-demand procedural ducky delivery service."
-authors = ["vcokltfre <vcokltfre@gmail.com>", "ChrisLovering <chris.lovering.95@gmail.com"]
+authors = ["vcokltfre <vcokltfre@gmail.com>", "ChrisLovering <chris.lovering.95@gmail.com>"]
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "3.10.*"
-fastapi = "0.85.0"
-Pillow = "9.2.0"
-aiofiles = "22.1.0"
-uvicorn = "0.18.3"
+
+fastapi = "0.103.1"
+Pillow = "10.0.0"
+aiofiles = "23.2.1"
+uvicorn = "0.23.2"
+frozendict = "2.3.8"
 
 [tool.poetry.dev-dependencies]
-flake8 = "5.0.4"
-flake8-annotations = "2.9.1"
-flake8-bugbear = "22.9.23"
-flake8-docstrings = "1.6.0"
-flake8-string-format = "0.3.0"
-flake8-tidy-imports = "4.8.0"
-flake8-todo = "0.7"
-pep8-naming = "0.13.2"
-pre-commit = "2.20.0"
-taskipy = "1.10.3"
-flake8-isort = "4.2.0"
+pre-commit = "3.4.0"
+ruff = "0.0.287"
+taskipy = "1.12.0"
 
 [tool.taskipy.tasks]
 lint = "pre-commit run --all-files"
 precommit = "pre-commit install"
 start-dev = "uvicorn api.main:app --reload"
-isort = "isort ."
 
-[tool.isort]
-multi_line_output = 6
-order_by_type = false
-case_sensitive = true
-combine_as_imports = true
-line_length = 120
+[tool.ruff]
+target-version = "py310"
+extend-exclude = [".cache"]
+ignore = [
+    "ANN002", "ANN003", "ANN101",
+    "C901",
+    "D100", "D104", "D105", "D107", "D203", "D212", "D214", "D215", "D416",
+    "EM",
+    "PLR0912",
+    "TRY003",
+]
+line-length = 120
+select = ["ALL"]
+
+[tool.ruff.isort]
+order-by-type = false
+case-sensitive = true
+combine-as-imports = true
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
