@@ -40,7 +40,7 @@ def make_file_path(dh: str, request_url: URL) -> str:
     return f"{fqdn}/static/{dh}.png"
 
 
-@app.get("/duck", response_model=DuckResponse, status_code=201)
+@app.get("/duck", status_code=201)
 async def get_duck(request: Request, response: Response, seed: int | None = None) -> DuckResponse:
     """Create a new random duck, with an optional seed."""
     dh = sha1(str(time()).encode()).hexdigest()  # noqa: S324
@@ -53,7 +53,7 @@ async def get_duck(request: Request, response: Response, seed: int | None = None
     return DuckResponse(file=file_path)
 
 
-@app.post("/duck", response_model=DuckResponse, status_code=201)
+@app.post("/duck", status_code=201)
 async def post_duck(request: Request, response: Response, duck: DuckRequest = None) -> DuckResponse:
     """Create a new duck with a given set of options."""
     dh = dicthash(duck.dict())
@@ -72,7 +72,7 @@ async def post_duck(request: Request, response: Response, duck: DuckRequest = No
     return DuckResponse(file=file_path)
 
 
-@app.get("/manduck", response_model=DuckResponse, status_code=201)
+@app.get("/manduck", status_code=201)
 async def get_man_duck(request: Request, response: Response, seed: int | None = None) -> DuckResponse:
     """Create a new man_duck, with an optional seed."""
     dh = sha1(str(time()).encode()).hexdigest()  # noqa: S324
@@ -86,7 +86,7 @@ async def get_man_duck(request: Request, response: Response, seed: int | None = 
     return DuckResponse(file=file_path)
 
 
-@app.post("/manduck", response_model=DuckResponse, status_code=201)
+@app.post("/manduck", status_code=201)
 async def post_man_duck(request: Request, response: Response, manduck: ManDuckRequest) -> DuckResponse:
     """Create a new man_duck with a given set of options."""
     dh = dicthash(manduck.dict())
