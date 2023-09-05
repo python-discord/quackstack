@@ -1,9 +1,9 @@
-import os
-from collections import namedtuple
 from pathlib import Path
 from random import Random
+from typing import NamedTuple
 
 from PIL import Image, ImageChops
+from frozendict import frozendict
 
 from quackstack import __file__ as qs_file
 
@@ -12,24 +12,32 @@ from .colors import DuckyColors, make_duck_colors
 ASSETS_PATH = Path(qs_file).parent / Path("assets", "ducky")
 DUCK_SIZE = (499, 600)
 
-ProceduralDucky = namedtuple("ProceduralDucky", "image colors hat equipment outfit")
+
+class ProceduralDucky(NamedTuple):
+    """Represents a Ducky and all its defined features/colours."""
+
+    image: Image.Image
+    colors: DuckyColors
+    hat: str
+    equipment: str
+    outfit: str
 
 
 class DuckBuilder:
     """A class used to build new ducks."""
 
-    templates = {
+    templates = frozendict({
         int(filename.name[0]): filename for filename in (ASSETS_PATH / "templates").iterdir()
-    }
-    hats = {
+    })
+    hats = frozendict({
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/hats").iterdir()
-    }
-    equipments = {
+    })
+    equipments = frozendict({
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment").iterdir()
-    }
-    outfits = {
+    })
+    outfits = frozendict({
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits").iterdir()
-    }
+    })
 
     def __init__(self, seed: int | None = None) -> None:
         self.random = Random(seed)
@@ -85,8 +93,8 @@ class DuckBuilder:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
         try:
             layer = Image.open(layer_path)
-        except FileNotFoundError:
-            raise ValueError(f"Invalid option provided: {os.path.basename(layer_path)} not found.")
+        except FileNotFoundError as e:
+            raise ValueError(f"Invalid option provided: {Path.name(layer_path)} not found.") from e
 
         if recolor:
             if isinstance(recolor, dict):

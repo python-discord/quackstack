@@ -3,7 +3,6 @@ from json import dumps
 from os import getenv
 from pathlib import Path
 from time import time
-from typing import Union
 
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import HTTPException
@@ -32,7 +31,7 @@ app.mount("/static", StaticFiles(directory=CACHE), name="static")
 
 def dicthash(data: dict) -> str:
     """Take a dictionary and convert it to a SHA-1 hash."""
-    return sha1(dumps(data).encode()).hexdigest()
+    return sha1(dumps(data).encode()).hexdigest()  # noqa: S324
 
 
 def make_file_path(dh: str, request_url: URL) -> str:
@@ -44,7 +43,7 @@ def make_file_path(dh: str, request_url: URL) -> str:
 @app.get("/duck", response_model=DuckResponse, status_code=201)
 async def get_duck(request: Request, response: Response, seed: int | None = None) -> DuckResponse:
     """Create a new random duck, with an optional seed."""
-    dh = sha1(str(time()).encode()).hexdigest()
+    dh = sha1(str(time()).encode()).hexdigest()  # noqa: S324
     file = CACHE / f"{dh}.png"
 
     DuckBuilder(seed).generate().image.save(file)
@@ -64,9 +63,9 @@ async def post_duck(request: Request, response: Response, duck: DuckRequest = No
         try:
             DuckBuilder().generate(options=duck.dict()).image.save(file)
         except ValueError as e:
-            raise HTTPException(400, e.args[0])
+            raise HTTPException(400, e.args[0]) from e
         except KeyError as e:
-            raise HTTPException(400, f"Invalid configuration option provided: '{e.args[0]}'")
+            raise HTTPException(400, f"Invalid configuration option provided: '{e.args[0]}'") from e
 
     file_path = make_file_path(dh, request.url)
     response.headers["Location"] = file_path
@@ -76,7 +75,7 @@ async def post_duck(request: Request, response: Response, duck: DuckRequest = No
 @app.get("/manduck", response_model=DuckResponse, status_code=201)
 async def get_man_duck(request: Request, response: Response, seed: int | None = None) -> DuckResponse:
     """Create a new man_duck, with an optional seed."""
-    dh = sha1(str(time()).encode()).hexdigest()
+    dh = sha1(str(time()).encode()).hexdigest()  # noqa: S324
 
     ducky = DuckBuilder(seed).generate()
     ducky = ManDuckBuilder(seed).generate(ducky=ducky)
@@ -97,9 +96,9 @@ async def post_man_duck(request: Request, response: Response, manduck: ManDuckRe
         try:
             ducky = ManDuckBuilder().generate(options=manduck.dict())
         except ValueError as e:
-            raise HTTPException(400, e.args[0])
+            raise HTTPException(400, e.args[0]) from e
         except KeyError as e:
-            raise HTTPException(400, f"Invalid configuration option provided: '{e.args[0]}'")
+            raise HTTPException(400, f"Invalid configuration option provided: '{e.args[0]}'") from e
         ducky.image.save(CACHE / f"{dh}.png")
 
     file_path = make_file_path(dh, request.url)
@@ -107,8 +106,8 @@ async def post_man_duck(request: Request, response: Response, manduck: ManDuckRe
     return DuckResponse(file=file_path)
 
 
-@app.get("/details/{type}", response_model=Union[ManDuckDetails, DuckyDetails])
-async def get_details(type: str) -> ManDuckDetails | DuckyDetails:
+@app.get("/details/{type}", response_model=ManDuckDetails | DuckyDetails)
+async def get_details(type: str) -> ManDuckDetails | DuckyDetails:  # noqa: A002
     """Get details about accessories which can be used to build ducks/man-ducks."""
     details = {
         "ducky": DuckyDetails(

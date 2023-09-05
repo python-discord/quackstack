@@ -1,16 +1,22 @@
-import os
-from collections import namedtuple
 from pathlib import Path
 from random import Random
+from typing import NamedTuple
 
 from PIL import Image, ImageChops
+from frozendict import frozendict
 
 from quackstack import __file__ as qs_file
 
 from .colors import DressColors, DuckyColors, make_man_duck_colors
 from .ducky import ProceduralDucky
 
-ManDucky = namedtuple("ManDucky", "image")
+
+class ManDucky(NamedTuple):
+    """Holds a reference to the ManDucky's source image."""
+
+    image: Image.Image
+
+
 Color = tuple[int, int, int]
 
 ASSETS_PATH = Path(qs_file).parent / Path("assets", "manduck")
@@ -21,25 +27,25 @@ class ManDuckBuilder:
     """Temporary class used to generate a ducky human."""
 
     VARIATIONS = (1, 2)
-    HATS = {
+    HATS = frozendict({
         filename.stem: filename for filename in (ASSETS_PATH / "accessories/hats").iterdir()
-    }
-    OUTFITS = {
+    })
+    OUTFITS = frozendict({
         "variation_1": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits/variation_1").iterdir()
         },
         "variation_2": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/outfits/variation_2").iterdir()
         },
-    }
-    EQUIPMENTS = {
+    })
+    EQUIPMENTS = frozendict({
         "variation_1": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment/variation_1").iterdir()
         },
         "variation_2": {
             filename.stem: filename for filename in (ASSETS_PATH / "accessories/equipment/variation_2").iterdir()
         },
-    }
+    })
 
     def __init__(self, seed: int | None = None) -> None:
         self.random = Random(seed)
@@ -127,8 +133,8 @@ class ManDuckBuilder:
         """Add the given layer on top of the ducky. Can be recolored with the recolor argument."""
         try:
             layer = Image.open(layer_path)
-        except FileNotFoundError:
-            raise ValueError(f"Invalid option provided: {os.path.basename(layer_path)} not found.")
+        except FileNotFoundError as e:
+            raise ValueError(f"Invalid option provided: {Path.name(layer_path)} not found.") from e
 
         if recolor:
             if isinstance(recolor, dict):
