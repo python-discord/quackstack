@@ -1,4 +1,5 @@
 from colorsys import hls_to_rgb, rgb_to_hls
+from itertools import starmap
 from random import Random
 from typing import NamedTuple
 
@@ -49,7 +50,7 @@ def make_duck_colors(random: Random) -> DuckyColors:
     # Shift the hue of the beck
     beak = (beak[0] + .1 % 1, beak[1], beak[2])
 
-    scalar_colors = [hls_to_rgb(*color_pair) for color_pair in (eye_main, eye_wing, wing, body, beak)]
+    scalar_colors = list(starmap(hls_to_rgb, (eye_main, eye_wing, wing, body, beak)))
     colors = (tuple(int(color * 256) for color in color_pair) for color_pair in scalar_colors)
 
     return DuckyColors(*colors)
