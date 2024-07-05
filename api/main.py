@@ -36,8 +36,8 @@ def dicthash(data: dict) -> str:
 
 def make_file_path(dh: str, request_url: URL) -> str:
     """Build a file path from dict_hash and a URL."""
-    fqdn = str(request_url).removesuffix(request_url.path)
-    return f"{fqdn}/static/{dh}.png"
+    path = f"/static/{dh}.png"
+    return str(request_url.replace(query="", path=path))
 
 
 @app.get("/duck", status_code=201)
