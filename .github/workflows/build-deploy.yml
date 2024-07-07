@@ -62,5 +62,5 @@ jobs:
         uses: azure/k8s-deploy@v4
         with:
           manifests: |
-            infra/kubernetes/namespaces/default/quackstack/deployment.yaml
+            infra/kubernetes/namespaces/apis/quackstack/deployment.yaml
           images: 'ghcr.io/python-discord/quackstack:${{ inputs.sha-tag }}'
